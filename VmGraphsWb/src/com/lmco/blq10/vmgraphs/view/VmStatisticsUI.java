@@ -101,6 +101,7 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
     {
         // TODO Auto-generated method stub
     }
+
     @Override
     public void MemoryStatisticsUpdated(VmMemoryStatistic acMemStatistics)
     {

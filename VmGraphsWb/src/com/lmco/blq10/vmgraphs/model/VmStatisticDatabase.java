@@ -142,7 +142,13 @@ public class VmStatisticDatabase
             {
                 lcGcStatistic.mnNumCollections += lcGc.getCollectionCount();
                 lcGcStatistic.mnCollectionTimeMs += lcGc.getCollectionTime();
+
+                System.out.println(lcGc.getName());
+                System.out.println("mnNumCollections = " + lcGcStatistic.mnNumCollections + " " + lcGc.getCollectionCount());
+                System.out.println("mnCollectionTimeMs = " + lcGcStatistic.mnCollectionTimeMs + " " + lcGc.getCollectionTime());
             }
+
+            System.out.println("done");
 
             lcMemoryStatistic.mrEdenSizeMb = 0;
             lcMemoryStatistic.mrSurvivorSizeMb = 0;
@@ -153,17 +159,14 @@ public class VmStatisticDatabase
                 if(lcMem.getName().contains("Eden Space"))
                 {
                     lcMemoryStatistic.mrEdenSizeMb = lcMem.getUsage().getUsed() / BYTES_IN_MEGABYTE;
-                    System.out.println("Name: " + lcMem.getName()  + " " + lcMemoryStatistic.mrEdenSizeMb);
                 }
                 else if (lcMem.getName().contains("Survivor Space"))
                 {
                     lcMemoryStatistic.mrSurvivorSizeMb = lcMem.getUsage().getUsed() / BYTES_IN_MEGABYTE;
-                    System.out.println("Name: " + lcMem.getName()  + " " + lcMemoryStatistic.mrSurvivorSizeMb);
                 }
                 else if (lcMem.getName().contains("Old Gen"))
                 {
                     lcMemoryStatistic.mrOldGenSizeMb = lcMem.getUsage().getUsed() / BYTES_IN_MEGABYTE;
-                    System.out.println("Name: " + lcMem.getName()  + " " + lcMemoryStatistic.mrOldGenSizeMb);
                 }
             }
 
