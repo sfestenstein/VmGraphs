@@ -18,7 +18,11 @@ import com.lmco.blq10.vmgraphs.model.VmStatisticDatabase;
 public class VmStatisticsUI extends JFrame implements IVmStatisticListener
 {
     JLabel mcOldGenLabel;
+    JLabel mcSurvivorGenLabel;
     VmStatisticDatabase mcDb;
+    private JLabel mcEdenGenLabel;
+    private JLabel mcCommittedMemLabel;
+    private JLabel mcMaxMemoryLabel;
     public VmStatisticsUI(VmStatisticDatabase acDb)
     {
         mcDb = acDb;
@@ -43,22 +47,52 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
         );
 
         mcOldGenLabel = new JLabel("---");
+
+        mcSurvivorGenLabel = new JLabel("---");
+
+        mcEdenGenLabel = new JLabel("---");
+
+        mcCommittedMemLabel = new JLabel("---");
+
+        mcMaxMemoryLabel = new JLabel("---");
         GroupLayout gl_mcVmStatisticsTextPanel = new GroupLayout(mcVmStatisticsTextPanel);
         gl_mcVmStatisticsTextPanel.setHorizontalGroup(
             gl_mcVmStatisticsTextPanel.createParallelGroup(Alignment.TRAILING)
-                .addGroup(Alignment.LEADING, gl_mcVmStatisticsTextPanel.createSequentialGroup()
+                .addGroup(gl_mcVmStatisticsTextPanel.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(mcOldGenLabel, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
-                    .addContainerGap())
+                    .addGroup(gl_mcVmStatisticsTextPanel.createParallelGroup(Alignment.LEADING)
+                        .addGroup(gl_mcVmStatisticsTextPanel.createSequentialGroup()
+                            .addGroup(gl_mcVmStatisticsTextPanel.createParallelGroup(Alignment.LEADING)
+                                .addComponent(mcEdenGenLabel, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
+                                .addComponent(mcSurvivorGenLabel, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
+                                .addComponent(mcOldGenLabel, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
+                                .addComponent(mcCommittedMemLabel, GroupLayout.PREFERRED_SIZE, 209, GroupLayout.PREFERRED_SIZE))
+                            .addGap(10))
+                        .addGroup(gl_mcVmStatisticsTextPanel.createSequentialGroup()
+                            .addComponent(mcMaxMemoryLabel, GroupLayout.DEFAULT_SIZE, 414, Short.MAX_VALUE)
+                            .addGap(10))))
         );
         gl_mcVmStatisticsTextPanel.setVerticalGroup(
             gl_mcVmStatisticsTextPanel.createParallelGroup(Alignment.LEADING)
                 .addGroup(gl_mcVmStatisticsTextPanel.createSequentialGroup()
-                    .addGap(5)
+                    .addContainerGap()
+                    .addComponent(mcEdenGenLabel, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addComponent(mcSurvivorGenLabel)
+                    .addPreferredGap(ComponentPlacement.RELATED)
                     .addComponent(mcOldGenLabel)
-                    .addContainerGap(403, Short.MAX_VALUE))
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addComponent(mcCommittedMemLabel, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addComponent(mcMaxMemoryLabel, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(225, Short.MAX_VALUE))
         );
         mcOldGenLabel.setBorder(BorderFactory.createTitledBorder("Old Gen Memory Mb"));
+        mcSurvivorGenLabel.setBorder(BorderFactory.createTitledBorder("Survivor Gen Memory Mb"));
+        mcEdenGenLabel.setBorder(BorderFactory.createTitledBorder("Eden Gen Memory Mb"));
+        mcCommittedMemLabel.setBorder(BorderFactory.createTitledBorder("Committed Memory Mb"));
+        mcMaxMemoryLabel.setBorder(BorderFactory.createTitledBorder("Maximum Memory Mb"));
+
         mcVmStatisticsTextPanel.setLayout(gl_mcVmStatisticsTextPanel);
         getContentPane().setLayout(groupLayout);
     }
@@ -66,12 +100,14 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
     public void GcStatisticsUpdated(VmGcStatistic acGcStatistic)
     {
         // TODO Auto-generated method stub
-
     }
     @Override
     public void MemoryStatisticsUpdated(VmMemoryStatistic acMemStatistics)
     {
         mcOldGenLabel.setText(Float.toString(acMemStatistics.mrOldGenSizeMb));
-
+        mcSurvivorGenLabel.setText(Float.toString(acMemStatistics.mrSurvivorSizeMb));
+        mcEdenGenLabel.setText(Float.toString(acMemStatistics.mrEdenSizeMb));
+        mcCommittedMemLabel.setText(Float.toString(acMemStatistics.mrCommittedSizeMb));
+        mcMaxMemoryLabel.setText(Float.toString(mcDb.getMaxHeapMb()));
     }
 }
