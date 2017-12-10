@@ -6,8 +6,10 @@ import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -39,6 +41,11 @@ public class VmStatisticDatabase
     private float mrMaxHeapMb = -1;
     private float mrCommittedSizeMb = -1;
 
+    private Map<String, VmGcStatistic> mcGcCollectionDb =
+            new HashMap<String, VmGcStatistic>();
+    private long mnLastGcCollectionTimeMs = 0;
+    private long mnLastGcCollections = 0;
+
     public VmStatisticDatabase()
     {
         mcPollVmTimer = new Timer();
@@ -61,53 +68,11 @@ public class VmStatisticDatabase
         mcStatisticsListeners.remove(acListener);
     }
 
-//    public void renderGraph(Graphics2D acG2d, Dimension acDimension, int anXOffset, int anYOffset)
-//    {
-//        int lnCounter = 0;
-//        for (VmMemoryStatistic lcMem : mcMemoryStatistics)
-//        {
-//            int lnCommitRatioPixels = getPixelFromValue((int) acDimension.getHeight(), anXOffset, 0, lcMem.mrCommittedSizeMb, mrMaxHeapMb);
-//            int lnEdenRatioPixels = getPixelFromValue((int) acDimension.getHeight(), anXOffset, 0, lcMem.mrEdenSizeMb, mrMaxHeapMb);
-//            int lnSurvivorRatioPixels = getPixelFromValue((int) acDimension.getHeight(), anXOffset, 0, lcMem.mrSurvivorSizeMb, mrMaxHeapMb);
-//            int lnOldRatioPixels = getPixelFromValue((int) acDimension.getHeight(), anXOffset, 0, lcMem.mrOldGenSizeMb, mrMaxHeapMb);
-//
-//            int lnBottom = acDimension.height - anYOffset;
-//            lnOldRatioPixels = lnBottom - lnOldRatioPixels;
-//            lnSurvivorRatioPixels = lnOldRatioPixels - lnSurvivorRatioPixels;
-//            lnEdenRatioPixels = lnSurvivorRatioPixels - lnEdenRatioPixels;
-//            lnCommitRatioPixels = lnBottom - lnCommitRatioPixels;
-//
-//            acG2d.setColor(Color.CYAN);
-//            acG2d.drawLine(lnCounter+anYOffset, lnCommitRatioPixels, lnCounter+anYOffset,0);
-//
-//            acG2d.setColor(Color.BLUE);
-//            acG2d.drawLine(lnCounter+anYOffset, lnCommitRatioPixels, lnCounter+anYOffset, lnEdenRatioPixels);
-//
-//            acG2d.setColor(Color.GREEN);
-//            acG2d.drawLine(lnCounter+anYOffset, lnSurvivorRatioPixels, lnCounter+anYOffset, lnEdenRatioPixels);
-//
-//            acG2d.setColor(Color.YELLOW);
-//            acG2d.drawLine(lnCounter+anYOffset, lnSurvivorRatioPixels, lnCounter+anYOffset, lnOldRatioPixels);
-//
-//            acG2d.setColor(Color.RED);
-//            acG2d.drawLine(lnCounter+anYOffset, lnBottom, lnCounter+anYOffset, lnOldRatioPixels);
-//
-//            lnCounter++;
-//        }
-//    }
-
     public final Collection<VmMemoryStatistic> GetMemoryStatistics()
     {
         return mcMemoryStatistics;
     }
 
-
-//    private int getPixelFromValue(int anDimension, int anLowOffset, int anHighOffset, float arValue, float arMaxValue)
-//    {
-//        int lnOffsetDifference = (anDimension - (anHighOffset + anLowOffset));
-//        int lnRelativePixel = (int) (lnOffsetDifference * (arValue)/arMaxValue);
-//        return lnRelativePixel + anHighOffset;
-//    }
 
     private class VmCollectionTask extends TimerTask
     {
@@ -135,18 +100,26 @@ public class VmStatisticDatabase
                 lcGcStatistic = new VmGcStatistic();
             }
 
-            lcGcStatistic.mnNumCollections = 0;
+            lcGcStatistic.mnCollectionCount = 0;
             lcGcStatistic.mnCollectionTimeMs = 0;
             List<GarbageCollectorMXBean> lcGcList = ManagementFactory.getGarbageCollectorMXBeans();
             for(GarbageCollectorMXBean lcGc : lcGcList)
             {
-                lcGcStatistic.mnNumCollections += lcGc.getCollectionCount();
-                lcGcStatistic.mnCollectionTimeMs += lcGc.getCollectionTime();
+                if (mcGcCollectionDb.containsKey(lcGc.getName()))
+                {
+                    mcGcCollectionDb.get(lcGc.getName()).mnCollectionTimeMs += lcGc.getCollectionTime();
+                    mcGcCollectionDb.get(lcGc.getName()).mnCollectionCount+= lcGc.getCollectionCount();
+                }
+                else
+                {
+                    mcGcCollectionDb.put(lcGc.getName(), new VmGcStatistic(lcGc.getCollectionCount(), lcGc.getCollectionTime()));
+                }
 
                 System.out.println(lcGc.getName());
-                System.out.println("mnNumCollections = " + lcGcStatistic.mnNumCollections + " " + lcGc.getCollectionCount());
+                System.out.println("mnNumCollections = " + lcGcStatistic.mnCollectionCount + " " + lcGc.getCollectionCount());
                 System.out.println("mnCollectionTimeMs = " + lcGcStatistic.mnCollectionTimeMs + " " + lcGc.getCollectionTime());
             }
+
 
             System.out.println("done");
 
@@ -196,7 +169,7 @@ public class VmStatisticDatabase
         for (IVmStatisticListener lcListener : mcStatisticsListeners)
         {
             lcListener.MemoryStatisticsUpdated(mcMemoryStatistics.peekFirst());
-            lcListener.GcStatisticsUpdated(mcGcStatistics.peekFirst());
+            lcListener.GcStatisticsUpdated(mcGcCollectionDb);
         }
     }
     public float getMaxHeapMb()
