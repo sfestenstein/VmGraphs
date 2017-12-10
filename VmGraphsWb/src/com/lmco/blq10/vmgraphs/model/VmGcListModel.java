@@ -26,13 +26,4 @@ public class VmGcListModel extends DefaultListModel<String>
         }
     }
 
-    MouseListener mouseListener = new MouseAdapter()
-    {
-        @Override
-        public void mouseClicked(MouseEvent acEvent)
-        {
-
-
-        }
-    };
 }

@@ -122,7 +122,13 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
             {
                 if (acEvent.getClickCount() == 2)
                 {
-                    System.out.println("clicked... " + mcGcCollectionList.getSelectedValue());
+                    String lcSelectedValue = (String)mcGcCollectionList.getSelectedValue();
+
+                    if (!mcDb.hasGcFrameFor(lcSelectedValue))
+                    {
+                        mcDb.addGcDetailsListener(lcSelectedValue, new GcDetailsFrame(lcSelectedValue));
+                    }
+                    mcDb.getGcDetailsListener(lcSelectedValue).getGcDetailsFrame().setVisible(true);
                 }
             }
         });
@@ -138,12 +144,6 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
         mcEdenGenLabel.setText(Float.toString(acMemStatistics.mrEdenSizeMb));
         mcCommittedMemLabel.setText(Float.toString(acMemStatistics.mrCommittedSizeMb));
         mcMaxMemoryLabel.setText(Float.toString(mcDb.getMaxHeapMb()));
-    }
-    @Override
-    public void GcStatisticsUpdated(long anGcCollectionTimeMs, long anGcCollections)
-    {
-        // TODO Auto-generated method stub
-
     }
 
 

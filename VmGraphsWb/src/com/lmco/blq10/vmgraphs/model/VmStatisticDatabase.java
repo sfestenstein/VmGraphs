@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import javax.swing.JPanel;
@@ -43,6 +44,7 @@ public class VmStatisticDatabase
 
     private Map<String, VmGcStatistic> mcGcCollectionDb =
             new HashMap<String, VmGcStatistic>();
+    private Map<String, IGcDetailsListener> mcGcDetailsListenerMap = new TreeMap<String, IGcDetailsListener>();
     private long mnLastGcCollectionTimeMs = 0;
     private long mnLastGcCollections = 0;
 
@@ -107,21 +109,27 @@ public class VmStatisticDatabase
             {
                 if (mcGcCollectionDb.containsKey(lcGc.getName()))
                 {
-                    mcGcCollectionDb.get(lcGc.getName()).mnCollectionTimeMs += lcGc.getCollectionTime();
-                    mcGcCollectionDb.get(lcGc.getName()).mnCollectionCount+= lcGc.getCollectionCount();
+                    mcGcCollectionDb.get(lcGc.getName()).mnCollectionTimeMs = lcGc.getCollectionTime();
+                    mcGcCollectionDb.get(lcGc.getName()).mnCollectionCount = lcGc.getCollectionCount();
                 }
                 else
                 {
                     mcGcCollectionDb.put(lcGc.getName(), new VmGcStatistic(lcGc.getCollectionCount(), lcGc.getCollectionTime()));
                 }
 
-                System.out.println(lcGc.getName());
-                System.out.println("mnNumCollections = " + lcGcStatistic.mnCollectionCount + " " + lcGc.getCollectionCount());
-                System.out.println("mnCollectionTimeMs = " + lcGcStatistic.mnCollectionTimeMs + " " + lcGc.getCollectionTime());
+//                System.out.println(lcGc.getName());
+//                System.out.println("mnNumCollections = " + lcGcStatistic.mnCollectionCount + " " + lcGc.getCollectionCount());
+//                System.out.println("mnCollectionTimeMs = " + lcGcStatistic.mnCollectionTimeMs + " " + lcGc.getCollectionTime());
+
+                if (mcGcDetailsListenerMap.containsKey(lcGc.getName()))
+                {
+                    mcGcDetailsListenerMap.get(lcGc.getName()).setNumCollections(mcGcCollectionDb.get(lcGc.getName()).mnCollectionCount);
+                    mcGcDetailsListenerMap.get(lcGc.getName()).setCollectionTime(mcGcCollectionDb.get(lcGc.getName()).mnCollectionTimeMs);
+                }
             }
 
 
-            System.out.println("done");
+//            System.out.println("done");
 
             lcMemoryStatistic.mrEdenSizeMb = 0;
             lcMemoryStatistic.mrSurvivorSizeMb = 0;
@@ -162,6 +170,19 @@ public class VmStatisticDatabase
             }
         }
 
+    }
+
+    public boolean hasGcFrameFor(String acGcFrameName)
+    {
+        return mcGcDetailsListenerMap.containsKey(acGcFrameName);
+    }
+    public void addGcDetailsListener(String acGcDetailsName, IGcDetailsListener acListener)
+    {
+        mcGcDetailsListenerMap.put(acGcDetailsName, acListener);
+    }
+    public IGcDetailsListener getGcDetailsListener(String acGcDetailsName)
+    {
+        return mcGcDetailsListenerMap.get(acGcDetailsName);
     }
 
     private void updateListeners()
