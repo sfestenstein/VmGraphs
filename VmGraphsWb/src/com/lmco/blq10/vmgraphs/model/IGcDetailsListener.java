@@ -4,8 +4,7 @@ import javax.swing.JFrame;
 
 public interface IGcDetailsListener
 {
-    void setNumCollections(long anNumCollections);
-    void setCollectionTime(long anCollectionTimeMs);
+    void setGcDetails(long anCollectionCount, long anCollectionTimeMs);
     JFrame getGcDetailsFrame();
 
 }

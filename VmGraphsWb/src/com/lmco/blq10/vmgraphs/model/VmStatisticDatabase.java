@@ -123,8 +123,9 @@ public class VmStatisticDatabase
 
                 if (mcGcDetailsListenerMap.containsKey(lcGc.getName()))
                 {
-                    mcGcDetailsListenerMap.get(lcGc.getName()).setNumCollections(mcGcCollectionDb.get(lcGc.getName()).mnCollectionCount);
-                    mcGcDetailsListenerMap.get(lcGc.getName()).setCollectionTime(mcGcCollectionDb.get(lcGc.getName()).mnCollectionTimeMs);
+                    mcGcDetailsListenerMap.get(lcGc.getName()).setGcDetails(
+                            mcGcCollectionDb.get(lcGc.getName()).mnCollectionCount,
+                            mcGcCollectionDb.get(lcGc.getName()).mnCollectionTimeMs);
                 }
             }
 

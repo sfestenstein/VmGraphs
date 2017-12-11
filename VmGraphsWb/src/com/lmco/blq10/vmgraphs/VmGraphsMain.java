@@ -9,7 +9,6 @@ public class VmGraphsMain
 {
     public static void main (String[] args)
     {
-        System.out.println("VmGraphs Main");
         VmStatisticDatabase lcDb = new VmStatisticDatabase();
         VmStatisticsUI lcStatisticsUI = new VmStatisticsUI(lcDb);
         lcStatisticsUI.setVisible(true);
