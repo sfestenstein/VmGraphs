@@ -87,6 +87,7 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
     {
         mcDb = acDb;
         mcVmGcListModel = new VmGcListModel();
+        VmStatisticsPanel mcVmStatisticsGraphicsPanel = new VmStatisticsPanel(mcDb);
 
         /**
          * Begin auto-generated code from Winbuilder Pro.  Do not modify any
@@ -95,7 +96,6 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
         JPanel mcVmStatisticsTextPanel = new JPanel();
         mcVmStatisticsTextPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 
-        VmStatisticsPanel mcVmStatisticsGraphicsPanel = new VmStatisticsPanel(mcDb);
         GroupLayout groupLayout = new GroupLayout(getContentPane());
         groupLayout.setHorizontalGroup(
             groupLayout.createParallelGroup(Alignment.TRAILING)
