@@ -17,31 +17,20 @@ import com.lmco.blq10.vmgraphs.model.VmStatisticDatabase;
  */
 public class VmStatisticsPanel extends JPanel
 {
+    /**
+     * Offset pixels so we have space to render the Y Axis
+     */
+    private static final int X_OFFSET_IN_PIXELS = 30;
+
+    /**
+     * Offset pixels so we have space to render the X Axis.
+     */
+    private static final int Y_OFFSET_IN_PIXELS = 30;
 
     /**
      * Virtual Machine Statistics database
      */
     private final VmStatisticDatabase mcDb;
-
-    /**
-     * Used to render the X Axis.
-     */
-    XAxisRenderer mcXAxisRenderer = new XAxisRenderer();
-
-    /**
-     * Used to render the Y Axis
-     */
-    YAxisRenderer mcYAxisRenderer = new YAxisRenderer();
-
-    /**
-     * Offset pixels so we have space to render the Y Axis
-     */
-    private static final int mnXOffset = 30;
-
-    /**
-     * Offset pixels so we have space to render the X Axis.
-     */
-    private static final int mnYOffset = 30;
 
     /**
      * Constructor
@@ -65,9 +54,9 @@ public class VmStatisticsPanel extends JPanel
     {
         super.paintComponent(acGraphics);
         Graphics2D lcG2d = (Graphics2D) acGraphics;
-        renderGraph(lcG2d, getSize(), mnXOffset, mnYOffset);
-        mcXAxisRenderer.drawXAxis(lcG2d, mnXOffset, mnYOffset, this);
-        mcYAxisRenderer.drawYAxis(lcG2d, mnXOffset, mnYOffset, this, mcDb);
+        renderGraph(lcG2d, getSize(), X_OFFSET_IN_PIXELS, Y_OFFSET_IN_PIXELS);
+        XAxisRenderer.drawXAxis(lcG2d, X_OFFSET_IN_PIXELS, Y_OFFSET_IN_PIXELS, this);
+        YAxisRenderer.drawYAxis(lcG2d, X_OFFSET_IN_PIXELS, Y_OFFSET_IN_PIXELS, this, mcDb);
     }
 
     /**
