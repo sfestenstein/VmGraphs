@@ -1,17 +1,29 @@
 package com.lmco.blq10.vmgraphs.model;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.DefaultListModel;
 
+/**
+ * @class VmGcListModel
+ * @brief List model of GC Types
+ *
+ */
 @SuppressWarnings("serial")
 public class VmGcListModel extends DefaultListModel<String>
 {
-    Map<String, VmGcStatistic> mcListDatabase = new HashMap<String, VmGcStatistic>();
+    /**
+     * Map of List items (indexed by a String) to GC Statistics.
+     */
+    private final Map<String, VmGcStatistic> mcListDatabase = new HashMap<String, VmGcStatistic>();
+
+    /**
+     * Used in place of 'addElement' from the parent class.  Argument list
+     * is a bit different from parent, so this is not an overriding function.
+     * @param acElement
+     * @param acGcStat
+     */
     public void addElement(String acElement, VmGcStatistic acGcStat)
     {
         if (mcListDatabase.containsKey(acElement))
@@ -25,5 +37,4 @@ public class VmGcListModel extends DefaultListModel<String>
             super.addElement(acElement);
         }
     }
-
 }

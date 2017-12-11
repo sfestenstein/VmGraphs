@@ -1,6 +1,11 @@
 package com.lmco.blq10.vmgraphs.view;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
@@ -26,9 +31,12 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
     private long mnLastGcTimeMs = 0;
     private final JSlider mcSlider;
     private JList mcGcList;
+    private DefaultListModel<String> mcGcListModel;
+    private final DateFormat mcDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
     public GcDetailsFrame(String acTitle)
     {
+        mcGcListModel = new DefaultListModel<String>();
         setTitle(acTitle);
         setResizable(false);
         mcCollectionCountLabel = new JLabel("---");
@@ -83,6 +91,7 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
         );
 
         mcGcList = new JList();
+        mcGcList.setModel(mcGcListModel);
         mcListScrollPane.setViewportView(mcGcList);
         getContentPane().setLayout(groupLayout);
         setSize(300, 450);
@@ -101,7 +110,16 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
         {
             if (anCollectionTimeMs - mnLastGcTimeMs > mcSlider.getValue())
             {
+                StringBuilder lcBuilder = new StringBuilder();
+                Date lcDate = new Date();
 
+                lcBuilder.append(mcDateFormat.format(lcDate));
+                lcBuilder.append(" : ");
+                lcBuilder.append(Long.toString(anCollectionTimeMs - mnLastGcTimeMs));
+                lcBuilder.append(" ms / ");
+                lcBuilder.append(Long.toString(anCollectionCount - mnCollectionCount));
+
+                mcGcListModel.addElement(lcBuilder.toString());
             }
             mnLastGcTimeMs = anCollectionTimeMs;
             mnCollectionCount = anCollectionCount;

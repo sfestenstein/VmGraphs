@@ -2,9 +2,25 @@ package com.lmco.blq10.vmgraphs.model;
 
 import javax.swing.JFrame;
 
+/**
+ * @interface
+ * @brief Interface for anyone who is interested in GC Details
+ *
+ */
 public interface IGcDetailsListener
 {
+    /**
+     * sets GC Details.
+     *
+     * @param anCollectionCount
+     * @param anCollectionTimeMs
+     */
     void setGcDetails(long anCollectionCount, long anCollectionTimeMs);
+
+    /**
+     * should return the JFrame encapsulating this listener.
+     * @return
+     */
     JFrame getGcDetailsFrame();
 
 }

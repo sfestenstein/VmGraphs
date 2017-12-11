@@ -18,72 +18,269 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 import javax.swing.JPanel;
 
+/**
+ * @class VmStatisticDatabase
+ * @brief Gathers and maintains Memory Statistics from the Java Virtual Machine.
+ *
+ */
 public class VmStatisticDatabase
 {
+    /**
+     * Maximum number of statistics held in this database.
+     *
+     * ** Future Work **
+     * It would be nice if this number were configurable and we were able to
+     * save off statistics to a file and then be able to load them offine.
+     */
     private static int MAX_NUM_STATISTICS = 3600;
 
+    /**
+     * Number of milliseconds to wait between polls of the Java Virtual Machine.
+     */
+    private static int POLLING_INTERVAL_MS = 1000;
+
+    /**
+     * Useful constant since statistics are in bytes.
+     */
     private static float BYTES_IN_MEGABYTE = 1048576.0f;
 
-    private final Deque <VmMemoryStatistic> mcMemoryStatistics = new LinkedBlockingDeque<VmMemoryStatistic>();
+    /**
+     * Actual collection of memory statistics.
+     */
+    private final Deque <VmMemoryStatistic> mcMemoryStatistics =
+            new LinkedBlockingDeque<VmMemoryStatistic>();
+
+    /**
+     * Actual Collection of Garbage Collection statistics.
+     *
+     * **Future Work**
+     * This member may not be critical.
+     */
     private final Deque <VmGcStatistic> mcGcStatistics = new LinkedBlockingDeque<VmGcStatistic>();
 
+    /**
+     * Collection of everyone interested in updates to this database.
+     */
     private final Set <IVmStatisticListener> mcStatisticsListeners =
             new HashSet<IVmStatisticListener>();
 
-    // TODO make this a collection of panels.
-    private JPanel mcPanelToRefresh = null;
+    /**
+     * Panels to refresh whenever new statistics are gathered.
+     */
+    private final Set<JPanel> mcPanelsToRefresh = new HashSet<JPanel>();
 
-    private Timer mcPollVmTimer;
-    private VmCollectionTask mcCollectionTask;
+    /**
+     * Timer to execute a collection of Memory Statistics from
+     * the Java Virtual Machine
+     */
+    private final Timer mcPollVmTimer;
 
+    /**
+     * Task to execute the collection of Memory Statistics from
+     * the Java Virtual Machine
+     */
+    private final VmCollectionTask mcCollectionTask;
+
+    /**
+     * Size of the Eden Generation memory, as of the last collection.
+     */
     private float mrEdenGenSizeMb = -1;
+
+    /**
+     * Size of the Survivor Generation memory, as of the last collection.
+     */
     private float mrSurvivorGenSizeMb = -1;
+
+    /**
+     * Size of the Old Generation memory, as of the last collection.
+     */
     private float mrOldGenSizeMb = -1;
+
+    /**
+     * Maximum allowable heap size that can be committed.
+     */
     private float mrMaxHeapMb = -1;
+
+    /**
+     * Current committed size of memory.
+     */
     private float mrCommittedSizeMb = -1;
 
-    private Map<String, VmGcStatistic> mcGcCollectionDb =
+    /**
+     * collection of the latest Grabage Collection data for each collection
+     * type (ParNew, ConcurrentMarkSweep, etc.).
+     */
+    private final Map<String, VmGcStatistic> mcGcCollectionDb =
             new HashMap<String, VmGcStatistic>();
-    private Map<String, IGcDetailsListener> mcGcDetailsListenerMap = new TreeMap<String, IGcDetailsListener>();
-    private long mnLastGcCollectionTimeMs = 0;
-    private long mnLastGcCollections = 0;
 
+    /**
+     * Map of listeners for each garbage Collection Type.
+     */
+    private final Map<String, IGcDetailsListener> mcGcDetailsListenerMap =
+            new TreeMap<String, IGcDetailsListener>();
+
+
+    /**
+     * Constructor
+     */
     public VmStatisticDatabase()
     {
         mcPollVmTimer = new Timer();
         mcCollectionTask = new VmCollectionTask();
-        mcPollVmTimer.schedule(mcCollectionTask, 1000,1000);
+        mcPollVmTimer.schedule(mcCollectionTask, POLLING_INTERVAL_MS,POLLING_INTERVAL_MS);
     }
 
+    /**
+     * Registers a panel to be refreshed when new statistics are collected.
+     * @param acPanel
+     */
     public void registerRefreshPanel(JPanel acPanel)
     {
-        mcPanelToRefresh = acPanel;
+        mcPanelsToRefresh.add(acPanel);
     }
 
+    /**
+     * Registers an IVmStatisticListener
+     * @param acListener
+     */
     public void registerStatisticsListener(IVmStatisticListener acListener)
     {
         mcStatisticsListeners.add(acListener);
     }
 
+    /**
+     * UnRegisters an IVmStatisticListener; only here to be pedantic.
+     * @param acListener
+     */
     public void unregisterStatisticsLIstener(IVmStatisticListener acListener)
     {
         mcStatisticsListeners.remove(acListener);
     }
 
+    /**
+     * Returns our current collection of memory statistics.
+     * @return
+     */
     public final Collection<VmMemoryStatistic> GetMemoryStatistics()
     {
         return mcMemoryStatistics;
     }
 
+    /**
+     * Indicates if we have a listener registered for a particular
+     * Garbage Collection Type (ParNew, ConcurrentMarkSweep, etc.)
+     *
+     * @param acGcFrameName
+     * @return
+     */
+    public boolean hasListenerFor(String acGcFrameName)
+    {
+        return mcGcDetailsListenerMap.containsKey(acGcFrameName);
+    }
 
+    /**
+     * Adds a Garbage Collection Listener for a particular
+     * Garbage Collection Type (ParNew, ConcurrentMarkSweep, etc.)
+     *
+     * @param acGcDetailsName
+     * @param acListener
+     */
+    public void addGcDetailsListener(String acGcDetailsName, IGcDetailsListener acListener)
+    {
+        mcGcDetailsListenerMap.put(acGcDetailsName, acListener);
+    }
+
+    /**
+     * Returns the Garbage Collection Listener for a particular
+     * Garbage Collection Type (ParNew, ConcurrentMarkSweep, etc.)
+     *
+     * @param acGcDetailsName
+     * @param acListener
+     */
+    public IGcDetailsListener getGcDetailsListener(String acGcDetailsName)
+    {
+        return mcGcDetailsListenerMap.get(acGcDetailsName);
+    }
+
+    /**
+     * Updates all listeners to this database
+     */
+    private void updateListeners()
+    {
+        for (IVmStatisticListener lcListener : mcStatisticsListeners)
+        {
+            lcListener.MemoryStatisticsUpdated(mcMemoryStatistics.peekFirst());
+            lcListener.GcStatisticsUpdated(mcGcCollectionDb);
+        }
+    }
+
+    /**
+     * Getter for the latest collected Max Heap size in Megabytes
+     * @return
+     */
+    public float getMaxHeapMb()
+    {
+        return mrMaxHeapMb;
+    }
+
+    /**
+     * Getter for the latest collected Old Generation memory size in Megabytes.
+     * @return
+     */
+    public float getOldMemMb()
+    {
+        return mrOldGenSizeMb;
+    }
+
+    /**
+     * Getter for the latest collected Survivor Generation memory size in Megabytes.
+     * @return
+     */
+    public float getSurvivorMemMb()
+    {
+        return mrSurvivorGenSizeMb;
+    }
+
+    /**
+     * Getter for the latest collected Eden Generation memory size in Megabytes.
+     * @return
+     */
+    public float getEdenMemMb()
+    {
+        return mrEdenGenSizeMb;
+    }
+
+    /**
+     * Getter for the latest collected Committed memory size in Megabytes.
+     * @return
+     */
+    public float getCommitMemMb()
+    {
+        return mrCommittedSizeMb;
+    }
+
+    /**
+     * @class VmCollectionTask
+     * @brief Private Class that extends TimerTask for collecting JVM Stats.
+     *
+     * ** Design Consideration**
+     * This is a bit of a large class to have as a private subclass, but it
+     * only implements the 'run' routine and is exceptionally convenient
+     * to make it part of VmStatisticDatabase class.
+     */
     private class VmCollectionTask extends TimerTask
     {
+        /**
+         * method called when this timer task is executed.
+         */
         @Override
         public void run()
         {
             VmMemoryStatistic lcMemoryStatistic;
             VmGcStatistic lcGcStatistic;
 
+            // If we are above the maximum number of Memory statics,
+            // recycle the oldest, otherwise new one up.
             if (mcMemoryStatistics.size() >= MAX_NUM_STATISTICS)
             {
                 lcMemoryStatistic = mcMemoryStatistics.pollLast();
@@ -93,6 +290,8 @@ public class VmStatisticDatabase
                 lcMemoryStatistic = new VmMemoryStatistic();
             }
 
+            // If we are above the maximum number of Garbage Collection statics,
+            // recycle the oldest, otherwise new one up.
             if (mcGcStatistics.size() >= MAX_NUM_STATISTICS)
             {
                 lcGcStatistic = mcGcStatistics.pollLast();
@@ -102,8 +301,8 @@ public class VmStatisticDatabase
                 lcGcStatistic = new VmGcStatistic();
             }
 
-            lcGcStatistic.mnCollectionCount = 0;
-            lcGcStatistic.mnCollectionTimeMs = 0;
+            // Get latest Garbage Collection information and populate our
+            // internal collections.
             List<GarbageCollectorMXBean> lcGcList = ManagementFactory.getGarbageCollectorMXBeans();
             for(GarbageCollectorMXBean lcGc : lcGcList)
             {
@@ -117,10 +316,6 @@ public class VmStatisticDatabase
                     mcGcCollectionDb.put(lcGc.getName(), new VmGcStatistic(lcGc.getCollectionCount(), lcGc.getCollectionTime()));
                 }
 
-//                System.out.println(lcGc.getName());
-//                System.out.println("mnNumCollections = " + lcGcStatistic.mnCollectionCount + " " + lcGc.getCollectionCount());
-//                System.out.println("mnCollectionTimeMs = " + lcGcStatistic.mnCollectionTimeMs + " " + lcGc.getCollectionTime());
-
                 if (mcGcDetailsListenerMap.containsKey(lcGc.getName()))
                 {
                     mcGcDetailsListenerMap.get(lcGc.getName()).setGcDetails(
@@ -129,12 +324,8 @@ public class VmStatisticDatabase
                 }
             }
 
-
-//            System.out.println("done");
-
-            lcMemoryStatistic.mrEdenSizeMb = 0;
-            lcMemoryStatistic.mrSurvivorSizeMb = 0;
-            lcMemoryStatistic.mrOldGenSizeMb = 0;
+            // Get latest JVM Memory information and populate our
+            // internal collections.
             List<MemoryPoolMXBean> lcMemoryList = ManagementFactory.getMemoryPoolMXBeans();
             for(MemoryPoolMXBean lcMem : lcMemoryList)
             {
@@ -152,70 +343,29 @@ public class VmStatisticDatabase
                 }
             }
 
-
+            // Get latest heap/committed information and populate member data
             MemoryUsage lcMu =ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
             lcMemoryStatistic.mrCommittedSizeMb = lcMu.getCommitted() / BYTES_IN_MEGABYTE;
             mrMaxHeapMb = lcMu.getMax() / BYTES_IN_MEGABYTE;
-            mrMaxHeapMb = mrMaxHeapMb;
+            mrCommittedSizeMb = lcMemoryStatistic.mrCommittedSizeMb;
+
+            // Set latest Eden/Survivior/Old sizes.
             mrOldGenSizeMb = lcMemoryStatistic.mrOldGenSizeMb;
             mrSurvivorGenSizeMb = lcMemoryStatistic.mrSurvivorSizeMb;
             mrEdenGenSizeMb = lcMemoryStatistic.mrEdenSizeMb;
-            mrCommittedSizeMb = lcMemoryStatistic.mrCommittedSizeMb;
 
+            // Push statistics into our internal Deques
             mcGcStatistics.addFirst(lcGcStatistic);
             mcMemoryStatistics.addFirst(lcMemoryStatistic);
+
+            // Now, update everyone who cares about this stuff.
             updateListeners();
-            if (mcPanelToRefresh != null)
+
+            // Refresh any jpanel that is plotting this information.
+            for (JPanel lcPanel : mcPanelsToRefresh)
             {
-                mcPanelToRefresh.repaint();
+                lcPanel.repaint();
             }
         }
-
-    }
-
-    public boolean hasGcFrameFor(String acGcFrameName)
-    {
-        return mcGcDetailsListenerMap.containsKey(acGcFrameName);
-    }
-    public void addGcDetailsListener(String acGcDetailsName, IGcDetailsListener acListener)
-    {
-        mcGcDetailsListenerMap.put(acGcDetailsName, acListener);
-    }
-    public IGcDetailsListener getGcDetailsListener(String acGcDetailsName)
-    {
-        return mcGcDetailsListenerMap.get(acGcDetailsName);
-    }
-
-    private void updateListeners()
-    {
-        for (IVmStatisticListener lcListener : mcStatisticsListeners)
-        {
-            lcListener.MemoryStatisticsUpdated(mcMemoryStatistics.peekFirst());
-            lcListener.GcStatisticsUpdated(mcGcCollectionDb);
-        }
-    }
-    public float getMaxHeapMb()
-    {
-        return mrMaxHeapMb;
-    }
-
-    public float getOldMemMb()
-    {
-        return mrOldGenSizeMb;
-    }
-
-    public float getSurvivorMemMb()
-    {
-        return mrSurvivorGenSizeMb;
-    }
-
-    public float getEdenMemMb()
-    {
-        return mrEdenGenSizeMb;
-    }
-
-    public float getCommitMemMb()
-    {
-        return mrCommittedSizeMb;
     }
 }
