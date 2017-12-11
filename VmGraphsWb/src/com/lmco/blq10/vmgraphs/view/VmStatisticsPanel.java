@@ -10,15 +10,43 @@ import javax.swing.JPanel;
 import com.lmco.blq10.vmgraphs.model.VmMemoryStatistic;
 import com.lmco.blq10.vmgraphs.model.VmStatisticDatabase;
 
+/**
+ * @class VmStatisticsPanel
+ * @brief Main panel to display and graph memory usage.
+ *
+ */
 public class VmStatisticsPanel extends JPanel
 {
-    final private VmStatisticDatabase mcDb;
+
+    /**
+     * Virtual Machine Statistics database
+     */
+    private final VmStatisticDatabase mcDb;
+
+    /**
+     * Used to render the X Axis.
+     */
     XAxisRenderer mcXAxisRenderer = new XAxisRenderer();
+
+    /**
+     * Used to render the Y Axis
+     */
     YAxisRenderer mcYAxisRenderer = new YAxisRenderer();
 
-    int mnXOffset = 30;
-    int mnYOffset = 30;
+    /**
+     * Offset pixels so we have space to render the Y Axis
+     */
+    private static final int mnXOffset = 30;
 
+    /**
+     * Offset pixels so we have space to render the X Axis.
+     */
+    private static final int mnYOffset = 30;
+
+    /**
+     * Constructor
+     * @param acDb
+     */
     public VmStatisticsPanel(VmStatisticDatabase acDb)
     {
         super();
@@ -26,6 +54,12 @@ public class VmStatisticsPanel extends JPanel
         mcDb.registerRefreshPanel(this);
     }
 
+
+    /**
+     * Called to repaint this component.
+     *
+     * @param acGraphics
+     */
     @Override
     public void paintComponent(Graphics acGraphics)
     {
@@ -36,7 +70,14 @@ public class VmStatisticsPanel extends JPanel
         mcYAxisRenderer.drawYAxis(lcG2d, mnXOffset, mnYOffset, this, mcDb);
     }
 
-    public void renderGraph(Graphics2D acG2d, Dimension acDimension, int anXOffset, int anYOffset)
+    /**
+     * Method called to render the graph portion of this panel
+     * @param acG2d
+     * @param acDimension
+     * @param anXOffset
+     * @param anYOffset
+     */
+    private void renderGraph(Graphics2D acG2d, Dimension acDimension, int anXOffset, int anYOffset)
     {
         int lnCounter = 0;
         for (VmMemoryStatistic lcMem : mcDb.GetMemoryStatistics())
@@ -71,6 +112,16 @@ public class VmStatisticsPanel extends JPanel
         }
     }
 
+    /**
+     * Convenient method to convert a value to a pixel
+     *
+     * @param anDimension
+     * @param anLowOffset
+     * @param anHighOffset
+     * @param arValue
+     * @param arMaxValue
+     * @return
+     */
     private int getPixelFromValue(int anDimension, int anLowOffset, int anHighOffset, float arValue, float arMaxValue)
     {
         int lnOffsetDifference = (anDimension - (anHighOffset + anLowOffset));

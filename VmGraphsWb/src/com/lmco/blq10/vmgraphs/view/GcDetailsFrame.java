@@ -20,24 +20,74 @@ import javax.swing.border.TitledBorder;
 
 import com.lmco.blq10.vmgraphs.model.IGcDetailsListener;
 
+/**
+ * @class GcDetailsFrame
+ * @brief JFrame to display Garbage Collection information
+ *
+ */
 @SuppressWarnings("serial")
 public class GcDetailsFrame extends JFrame implements IGcDetailsListener
 {
+    /**
+     * Date format for the list of long garbage collections.
+     */
+    private static final DateFormat mcDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
+    /**
+     * Label to display latest Garbage Colleciton Count.
+     */
     private final JLabel mcCollectionCountLabel;
+
+    /**
+     * Label to average Garbage Colleciton time in MS.
+     */
     private final JLabel mcAverageGcTimeMslabel;
 
+    /**
+     * Latest count of garbage collections to date
+     */
     private long mnCollectionCount = 0;
-    private long mnAverageGcTimeMs = 0;
-    private long mnLastGcTimeMs = 0;
-    private final JSlider mcSlider;
-    private JList mcGcList;
-    private DefaultListModel<String> mcGcListModel;
-    private final DateFormat mcDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
+    /**
+     * Latest amount of time GC has used to take care of business.
+     */
+    private long mnLastGcTimeMs = 0;
+
+    /**
+     * Slider to indicate what threshold will be used to log
+     * a long garbage collection.
+     */
+    private final JSlider mcSlider;
+
+    /**
+     * List of all long garbage collecitons.
+     */
+    private JList<String> mcGcList;
+
+    /**
+     * Jlist model for mcGcList.
+     */
+    private DefaultListModel<String> mcGcListModel;
+
+    /**
+     * We want mcGcList in a scroll pane.
+     */
+    private final JScrollPane mcListScrollPane;
+
+    /**
+     * Constructor
+     *
+     * @param acTitle
+     */
     public GcDetailsFrame(String acTitle)
     {
         mcGcListModel = new DefaultListModel<String>();
         setTitle(acTitle);
+
+        /**
+         * Begin auto-generated code from Winbuilder Pro.  Do not modify any
+         * of this code by hand unless you really know what you are doing.
+         */
         setResizable(false);
         mcCollectionCountLabel = new JLabel("---");
         mcCollectionCountLabel.setBorder(BorderFactory.createTitledBorder("Garbage Collection Count"));
@@ -47,17 +97,15 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
 
         JButton mcResetButton = new JButton("Reset Statistics");
 
-        mcSlider = new JSlider();
+        mcSlider = new JSlider(0, 1200, 300);
         mcSlider.setBorder(new TitledBorder(null, "GC Log Threshold", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        mcSlider.setMajorTickSpacing(200);
+        mcSlider.setMajorTickSpacing(300);
         mcSlider.setSnapToTicks(true);
         mcSlider.setPaintLabels(true);
         mcSlider.setPaintTicks(true);
-        mcSlider.setMinorTickSpacing(100);
-        mcSlider.setValue(500);
-        mcSlider.setMaximum(1000);
+        mcSlider.setMinorTickSpacing(50);
 
-        JScrollPane mcListScrollPane = new JScrollPane();
+        mcListScrollPane = new JScrollPane();
         mcListScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         mcListScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
@@ -89,25 +137,40 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
                     .addComponent(mcListScrollPane, GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
                     .addContainerGap())
         );
-
-        mcGcList = new JList();
-        mcGcList.setModel(mcGcListModel);
-        mcListScrollPane.setViewportView(mcGcList);
         getContentPane().setLayout(groupLayout);
         setSize(300, 450);
+        /**
+         * End Auto-Generated code
+         */
+
+        mcGcList = new JList<String>();
+        mcGcList.setModel(mcGcListModel);
+        mcListScrollPane.setViewportView(mcGcList);
     }
 
+
+    /**
+     * return 'this' as a JFrame
+     */
     @Override
     public JFrame getGcDetailsFrame()
     {
         return this;
     }
 
+
+    /**
+     * Sets latest GC Details
+     *
+     * @param anCollectionCount
+     * @param anCollectionTimeMs
+     */
     @Override
     public void setGcDetails(long anCollectionCount, long anCollectionTimeMs)
     {
         if (mnCollectionCount != anCollectionCount)
         {
+            System.out.println("mcSlider.getValue() = " +  mcSlider.getValue());
             if (anCollectionTimeMs - mnLastGcTimeMs > mcSlider.getValue())
             {
                 StringBuilder lcBuilder = new StringBuilder();
@@ -124,17 +187,14 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
             mnLastGcTimeMs = anCollectionTimeMs;
             mnCollectionCount = anCollectionCount;
 
+            long lnAverageGcTimeMs = 0;
             if (mnCollectionCount != 0)
             {
-                mnAverageGcTimeMs = anCollectionTimeMs / mnCollectionCount;
-            }
-            else
-            {
-                mnAverageGcTimeMs = 0;
+                lnAverageGcTimeMs = anCollectionTimeMs / mnCollectionCount;
             }
 
             mcCollectionCountLabel.setText(Long.toString(mnCollectionCount));
-            mcAverageGcTimeMslabel.setText(Long.toString(mnAverageGcTimeMs));
+            mcAverageGcTimeMslabel.setText(Long.toString(lnAverageGcTimeMs));
         }
     }
 }

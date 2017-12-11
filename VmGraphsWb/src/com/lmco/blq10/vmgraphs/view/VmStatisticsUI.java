@@ -25,23 +25,73 @@ import com.lmco.blq10.vmgraphs.model.VmMemoryStatistic;
 import com.lmco.blq10.vmgraphs.model.VmStatisticDatabase;
 
 @SuppressWarnings("serial")
+/**
+ * @class VmStatisticsUI
+ * @brief Top Level UI Panel to hold all other graphical components
+ *
+ */
 public class VmStatisticsUI extends JFrame implements IVmStatisticListener
 {
-    JLabel mcOldGenLabel;
-    JLabel mcSurvivorGenLabel;
-    VmStatisticDatabase mcDb;
-    private JLabel mcEdenGenLabel;
-    private JLabel mcCommittedMemLabel;
-    private JLabel mcMaxMemoryLabel;
-    private JScrollPane mcGcCollectionPane;
-    private JList mcGcCollectionList;
+    /**
+     * Label to display the amount of Old Gen Memory being used
+     */
+    private final JLabel mcOldGenLabel;
+
+    /**
+     * Label to display the amount of Survivor Gen Memory being used
+     */
+    private final JLabel mcSurvivorGenLabel;
+
+    /**
+     * Label to display the amount of Eden Gen memory being used.
+     */
+    private final JLabel mcEdenGenLabel;
+
+    /**
+     * Label to display the amount of Committed Memory being used.
+     */
+    private final JLabel mcCommittedMemLabel;
+
+    /**
+     * Label to display the max heap allowed to be committed.
+     */
+    private final JLabel mcMaxMemoryLabel;
+
+    /**
+     * Virtual Machine statistics database.
+     */
+    private final VmStatisticDatabase mcDb;
+
+    /**
+     * List of all the different garbage collection types used.
+     */
+    private final JList mcGcCollectionList;
+
+    /**
+     * Model for mcGcCollectionList
+     */
     private final VmGcListModel mcVmGcListModel;
+
+    /**
+     * Put the mcGcCollectionList in a scroll pane.  It's just good practice!
+     */
+    private final JScrollPane mcGcCollectionPane;
+
+
+    /**
+     * Constructor
+     *
+     * @param acDb
+     */
     public VmStatisticsUI(VmStatisticDatabase acDb)
     {
         mcDb = acDb;
-        mcDb.registerStatisticsListener(this);
         mcVmGcListModel = new VmGcListModel();
 
+        /**
+         * Begin auto-generated code from Winbuilder Pro.  Do not modify any
+         * of this code by hand unless you really know what you are doing.
+         */
         JPanel mcVmStatisticsTextPanel = new JPanel();
         mcVmStatisticsTextPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 
@@ -61,13 +111,9 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
         );
 
         mcOldGenLabel = new JLabel("---");
-
         mcSurvivorGenLabel = new JLabel("---");
-
         mcEdenGenLabel = new JLabel("---");
-
         mcCommittedMemLabel = new JLabel("---");
-
         mcMaxMemoryLabel = new JLabel("---");
 
         mcGcCollectionPane = new JScrollPane();
@@ -115,6 +161,13 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
         mcCommittedMemLabel.setBorder(BorderFactory.createTitledBorder("Committed Memory Mb"));
         mcMaxMemoryLabel.setBorder(BorderFactory.createTitledBorder("Maximum Memory Mb"));
 
+        mcVmStatisticsTextPanel.setLayout(gl_mcVmStatisticsTextPanel);
+        getContentPane().setLayout(groupLayout);
+
+        /**
+         * End Auto-Generated code
+         */
+        mcDb.registerStatisticsListener(this);
         mcGcCollectionList.addMouseListener(new MouseAdapter()
         {
             @Override
@@ -124,7 +177,7 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
                 {
                     String lcSelectedValue = (String)mcGcCollectionList.getSelectedValue();
 
-                    if (!mcDb.hasGcFrameFor(lcSelectedValue))
+                    if (!mcDb.hasListenerFor(lcSelectedValue))
                     {
                         mcDb.addGcDetailsListener(lcSelectedValue, new GcDetailsFrame(lcSelectedValue));
                     }
@@ -132,10 +185,13 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
                 }
             }
         });
-        mcVmStatisticsTextPanel.setLayout(gl_mcVmStatisticsTextPanel);
-        getContentPane().setLayout(groupLayout);
+
     }
 
+    /**
+     * Called when new memory statistics are available.
+     * @param acMemStatistics
+     */
     @Override
     public void MemoryStatisticsUpdated(VmMemoryStatistic acMemStatistics)
     {
@@ -146,7 +202,10 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
         mcMaxMemoryLabel.setText(Float.toString(mcDb.getMaxHeapMb()));
     }
 
-
+    /**
+     * Called when new GC statistics are available.
+     * @param acGcStatistics
+     */
     @Override
     public void GcStatisticsUpdated(Map<String, VmGcStatistic> acGcStatistics)
     {
