@@ -12,7 +12,7 @@ public class VmGraphsMain
         VmStatisticDatabase lcDb = new VmStatisticDatabase();
         VmStatisticsUI lcStatisticsUI = new VmStatisticsUI(lcDb);
         lcStatisticsUI.setVisible(true);
-        lcStatisticsUI.setSize(900, 400);
+        lcStatisticsUI.setSize(1275, 400);
         lcStatisticsUI.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }

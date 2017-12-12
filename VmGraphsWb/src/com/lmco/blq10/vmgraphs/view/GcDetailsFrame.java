@@ -170,7 +170,6 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
     {
         if (mnCollectionCount != anCollectionCount)
         {
-            System.out.println("mcSlider.getValue() = " +  mcSlider.getValue());
             if (anCollectionTimeMs - mnLastGcTimeMs > mcSlider.getValue())
             {
                 StringBuilder lcBuilder = new StringBuilder();

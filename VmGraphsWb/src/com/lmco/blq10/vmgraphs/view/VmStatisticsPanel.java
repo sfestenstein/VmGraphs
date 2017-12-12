@@ -18,14 +18,18 @@ import com.lmco.blq10.vmgraphs.model.VmStatisticDatabase;
 public class VmStatisticsPanel extends JPanel
 {
     /**
-     * Offset pixels so we have space to render the Y Axis
+     * Offset pixels so we have space to render the Y Axis.  This sounds
+     * backwards, but we need to shift the graph to the right (x axis) in
+     * order to make room to paint the Y Axis.
      */
-    private static final int X_OFFSET_IN_PIXELS = 30;
+    private static final int X_OFFSET_IN_PIXELS = 45;
 
     /**
-     * Offset pixels so we have space to render the X Axis.
+     * Offset pixels so we have space to render the X Axis.  This sounds
+     * backwards, but we need to shift the graph up (Y axis) in
+     * order to make room to paint the X Axis.
      */
-    private static final int Y_OFFSET_IN_PIXELS = 30;
+    private static final int Y_OFFSET_IN_PIXELS = 45;
 
     /**
      * Virtual Machine Statistics database
@@ -83,19 +87,19 @@ public class VmStatisticsPanel extends JPanel
             lnCommitRatioPixels = lnBottom - lnCommitRatioPixels;
 
             acG2d.setColor(Color.CYAN);
-            acG2d.drawLine(lnCounter+anYOffset, lnCommitRatioPixels, lnCounter+anYOffset,0);
+            acG2d.drawLine(lnCounter+anXOffset, lnCommitRatioPixels, lnCounter+anXOffset,0);
 
             acG2d.setColor(Color.BLUE);
-            acG2d.drawLine(lnCounter+anYOffset, lnCommitRatioPixels, lnCounter+anYOffset, lnEdenRatioPixels);
+            acG2d.drawLine(lnCounter+anXOffset, lnCommitRatioPixels, lnCounter+anXOffset, lnEdenRatioPixels);
 
             acG2d.setColor(Color.GREEN);
-            acG2d.drawLine(lnCounter+anYOffset, lnSurvivorRatioPixels, lnCounter+anYOffset, lnEdenRatioPixels);
+            acG2d.drawLine(lnCounter+anXOffset, lnSurvivorRatioPixels, lnCounter+anXOffset, lnEdenRatioPixels);
 
             acG2d.setColor(Color.YELLOW);
-            acG2d.drawLine(lnCounter+anYOffset, lnSurvivorRatioPixels, lnCounter+anYOffset, lnOldRatioPixels);
+            acG2d.drawLine(lnCounter+anXOffset, lnSurvivorRatioPixels, lnCounter+anXOffset, lnOldRatioPixels);
 
             acG2d.setColor(Color.RED);
-            acG2d.drawLine(lnCounter+anYOffset, lnBottom, lnCounter+anYOffset, lnOldRatioPixels);
+            acG2d.drawLine(lnCounter+anXOffset, lnBottom, lnCounter+anXOffset, lnOldRatioPixels);
 
             lnCounter++;
         }
