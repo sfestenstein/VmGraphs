@@ -1,5 +1,7 @@
 package com.lmco.blq10.vmgraphs.view;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -52,6 +54,16 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
      * Latest amount of time GC has used to take care of business.
      */
     private long mnLastGcTimeMs = 0;
+
+    /**
+     * Collection count since the last reset.
+     */
+    private long mnCollectionCountReset = 0;
+
+    /**
+     * Collection time since the last reset.
+     */
+    private long mnLastGcTimeResetMs = 0;
 
     /**
      * Slider to indicate what threshold will be used to log
@@ -146,6 +158,17 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
         mcGcList = new JList<String>();
         mcGcList.setModel(mcGcListModel);
         mcListScrollPane.setViewportView(mcGcList);
+        mcResetButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent arg0)
+            {
+                mnLastGcTimeResetMs = mnLastGcTimeMs;
+                mnCollectionCountReset = mnCollectionCount;
+                mcCollectionCountLabel.setText("---");
+                mcAverageGcTimeMslabel.setText("---");
+            }
+        });
     }
 
 
@@ -183,16 +206,19 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
 
                 mcGcListModel.addElement(lcBuilder.toString());
             }
+
             mnLastGcTimeMs = anCollectionTimeMs;
             mnCollectionCount = anCollectionCount;
+            long lnCorrectedCollectionCount = mnCollectionCount - mnCollectionCountReset;
+            long lnCorrectedCollectionTimMs = mnLastGcTimeMs - mnLastGcTimeResetMs;
 
             long lnAverageGcTimeMs = 0;
-            if (mnCollectionCount != 0)
+            if (lnCorrectedCollectionCount != 0)
             {
-                lnAverageGcTimeMs = anCollectionTimeMs / mnCollectionCount;
+                lnAverageGcTimeMs = lnCorrectedCollectionTimMs / lnCorrectedCollectionCount;
             }
 
-            mcCollectionCountLabel.setText(Long.toString(mnCollectionCount));
+            mcCollectionCountLabel.setText(Long.toString(lnCorrectedCollectionCount));
             mcAverageGcTimeMslabel.setText(Long.toString(lnAverageGcTimeMs));
         }
     }
