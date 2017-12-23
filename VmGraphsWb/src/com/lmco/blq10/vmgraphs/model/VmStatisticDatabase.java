@@ -26,15 +26,6 @@ import javax.swing.JPanel;
 public class VmStatisticDatabase
 {
     /**
-     * Maximum number of statistics held in this database.
-     *
-     * ** Future Work **
-     * It would be nice if this number were configurable and we were able to
-     * save off statistics to a file and then be able to load them offine.
-     */
-    private static int MAX_NUM_STATISTICS = 3600;
-
-    /**
      * Number of milliseconds to wait between polls of the Java Virtual Machine.
      */
     private static int POLLING_INTERVAL_MS = 1000;
@@ -43,6 +34,15 @@ public class VmStatisticDatabase
      * Useful constant since statistics are in bytes.
      */
     private static float BYTES_IN_MEGABYTE = 1048576.0f;
+
+    /**
+     * Maximum number of statistics held in this database.
+     *
+     * ** Future Work **
+     * It would be nice if this number were configurable and we were able to
+     * save off statistics to a file and then be able to load them offine.
+     */
+    private final int mnNumStatistics;
 
     /**
      * Actual collection of memory statistics.
@@ -82,6 +82,17 @@ public class VmStatisticDatabase
     private final VmCollectionTask mcCollectionTask;
 
     /**
+     * Timer to save off statistics.
+     */
+    private final Timer mcFileSaveTimer;
+
+    /**
+     * Task to execute the collection of Memory Statistics from
+     * the Java Virtual Machine
+     */
+    private final FileSaveOffTask mcFileSaveTask;
+
+    /**
      * Size of the Eden Generation memory, as of the last collection.
      */
     private float mrEdenGenSizeMb = -1;
@@ -106,6 +117,7 @@ public class VmStatisticDatabase
      */
     private float mrCommittedSizeMb = -1;
 
+    private final VmFileUtils mcFileUtils;
     /**
      * collection of the latest Grabage Collection data for each collection
      * type (ParNew, ConcurrentMarkSweep, etc.).
@@ -123,11 +135,17 @@ public class VmStatisticDatabase
     /**
      * Constructor
      */
-    public VmStatisticDatabase()
+    public VmStatisticDatabase(int anNumStatistics, VmFileUtils acFileUtils)
     {
+        mcFileUtils = acFileUtils;
+        mnNumStatistics = anNumStatistics;
         mcPollVmTimer = new Timer();
         mcCollectionTask = new VmCollectionTask();
         mcPollVmTimer.schedule(mcCollectionTask, POLLING_INTERVAL_MS,POLLING_INTERVAL_MS);
+
+        mcFileSaveTimer = new Timer();
+        mcFileSaveTask = new FileSaveOffTask();
+        mcFileSaveTimer.schedule(mcFileSaveTask, mnNumStatistics*1000, mnNumStatistics*1000);
     }
 
     /**
@@ -281,7 +299,7 @@ public class VmStatisticDatabase
 
             // If we are above the maximum number of Memory statics,
             // recycle the oldest, otherwise new one up.
-            if (mcMemoryStatistics.size() >= MAX_NUM_STATISTICS)
+            if (mcMemoryStatistics.size() >= mnNumStatistics)
             {
                 lcMemoryStatistic = mcMemoryStatistics.pollLast();
             }
@@ -292,7 +310,7 @@ public class VmStatisticDatabase
 
             // If we are above the maximum number of Garbage Collection statics,
             // recycle the oldest, otherwise new one up.
-            if (mcGcStatistics.size() >= MAX_NUM_STATISTICS)
+            if (mcGcStatistics.size() >= mnNumStatistics)
             {
                 lcGcStatistic = mcGcStatistics.pollLast();
             }
@@ -347,6 +365,7 @@ public class VmStatisticDatabase
             MemoryUsage lcMu =ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
             lcMemoryStatistic.mrCommittedSizeMb = lcMu.getCommitted() / BYTES_IN_MEGABYTE;
             mrMaxHeapMb = lcMu.getMax() / BYTES_IN_MEGABYTE;
+            lcMemoryStatistic.mrMaxSizeMb = mrMaxHeapMb;
             mrCommittedSizeMb = lcMemoryStatistic.mrCommittedSizeMb;
 
             // Set latest Eden/Survivior/Old sizes.
@@ -366,6 +385,21 @@ public class VmStatisticDatabase
             {
                 lcPanel.repaint();
             }
+        }
+    }
+
+    private class FileSaveOffTask extends TimerTask
+    {
+//        VmFileUtils mcFileUtils = new VmFileUtils("C:\\Users\\sifesten\\VmStats");
+
+        /**
+         * method called when this timer task is executed.
+         */
+        @Override
+        public void run()
+        {
+            System.out.println("Saving Stats");
+            mcFileUtils.saveOffMemoryStats(mcMemoryStatistics);
         }
     }
 }

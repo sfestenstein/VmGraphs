@@ -1,11 +1,18 @@
 package com.lmco.blq10.vmgraphs.model;
 
+import java.io.Serializable;
+
 /**
  * @class VmMemoryStatistic
  * @brief Holds data that characterizes memory use within an application.
  */
-public class VmMemoryStatistic
+public class VmMemoryStatistic implements Serializable
 {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 7756525984129702378L;
+
     /**
      * Size of memory that was recently "new'd" up.
      */

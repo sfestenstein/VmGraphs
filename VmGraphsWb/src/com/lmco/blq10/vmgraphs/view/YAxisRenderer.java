@@ -7,6 +7,7 @@ import java.text.DecimalFormat;
 
 import javax.swing.JPanel;
 
+import com.lmco.blq10.vmgraphs.model.VmMemoryStatistic;
 import com.lmco.blq10.vmgraphs.model.VmStatisticDatabase;
 
 /**
@@ -33,31 +34,52 @@ public class YAxisRenderer
      * @param anXOffset
      * @param anYOffset
      * @param acPanel
+     * @param acDb
      */
     public static void drawYAxis(Graphics2D acGraphics, int anXOffset, int anYOffset, JPanel acPanel, VmStatisticDatabase acDb)
+    {
+        VmMemoryStatistic lcStat = new VmMemoryStatistic();
+        lcStat.mrCommittedSizeMb = acDb.getCommitMemMb();
+        lcStat.mrEdenSizeMb = acDb.getEdenMemMb();
+        lcStat.mrMaxSizeMb = acDb.getMaxHeapMb();
+        lcStat.mrOldGenSizeMb = acDb.getOldMemMb();
+        lcStat.mrSurvivorSizeMb = acDb.getSurvivorMemMb();
+        drawYAxis(acGraphics, anXOffset, anYOffset, acPanel, lcStat);
+    }
+
+    /**
+     * Method to render the Y Axis
+     *
+     * @param acGraphics
+     * @param anXOffset
+     * @param anYOffset
+     * @param acPanel
+     * @param acLabelStat
+     */
+    public static void drawYAxis(Graphics2D acGraphics, int anXOffset, int anYOffset, JPanel acPanel, VmMemoryStatistic acLabelStat)
     {
         acGraphics.setColor(Color.BLACK);
         acGraphics.drawLine(anXOffset, 0,
                             anXOffset,
                             acPanel.getHeight()-anYOffset);
 
-        float lrMaxHeap = acDb.getMaxHeapMb();
-        float lrOldMem = acDb.getOldMemMb();
+        float lrMaxHeap = acLabelStat.mrMaxSizeMb;
+        float lrOldMem = acLabelStat.mrOldGenSizeMb;
         float lrOldMemRatio = lrOldMem / lrMaxHeap;
         int lnOldMemPixel =  (int) (lrOldMemRatio * (acPanel.getHeight()-anYOffset));
         lnOldMemPixel =  acPanel.getHeight() - (anYOffset + lnOldMemPixel);
 
-        float lrSurvivorMem = acDb.getSurvivorMemMb();
+        float lrSurvivorMem = acLabelStat.mrSurvivorSizeMb;
         float lrSurvivorMemRatio = lrSurvivorMem / lrMaxHeap;
         int lnSurvivorMemPixel =  (int) (lrSurvivorMemRatio * (acPanel.getHeight()-anYOffset));
         lnSurvivorMemPixel = lnOldMemPixel - lnSurvivorMemPixel;
 
-        float lrEdenMem = acDb.getEdenMemMb();
+        float lrEdenMem = acLabelStat.mrEdenSizeMb;
         float lrEdenMemRatio = lrEdenMem / lrMaxHeap;
         int lnEdenMemPixel =  (int) (lrEdenMemRatio * (acPanel.getHeight()-anYOffset));
         lnEdenMemPixel = lnSurvivorMemPixel - lnEdenMemPixel;
 
-        float lrCommitMem = acDb.getCommitMemMb();
+        float lrCommitMem = acLabelStat.mrCommittedSizeMb;
         float lrCommitMemRatio = lrCommitMem / lrMaxHeap;
         int lnCommitMemPixel =  (int) (lrCommitMemRatio * (acPanel.getHeight()-anYOffset));
         lnCommitMemPixel = acPanel.getHeight() - (anYOffset + lnCommitMemPixel);
@@ -67,7 +89,6 @@ public class YAxisRenderer
         drawTick(acGraphics, (int) lrEdenMem, anXOffset, lnEdenMemPixel, acPanel);
         drawTick(acGraphics, (int) lrCommitMem, anXOffset, lnCommitMemPixel, acPanel);
     }
-
     /**
      * Method to draw a tick on the x axis along with its label.
      *

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.Collection;
 
 import javax.swing.JPanel;
 
@@ -58,7 +59,7 @@ public class VmStatisticsPanel extends JPanel
     {
         super.paintComponent(acGraphics);
         Graphics2D lcG2d = (Graphics2D) acGraphics;
-        renderGraph(lcG2d, getSize(), X_OFFSET_IN_PIXELS, Y_OFFSET_IN_PIXELS);
+        renderGraph(lcG2d, getSize(), X_OFFSET_IN_PIXELS, Y_OFFSET_IN_PIXELS, mcDb.GetMemoryStatistics());
         XAxisRenderer.drawXAxis(lcG2d, X_OFFSET_IN_PIXELS, Y_OFFSET_IN_PIXELS, this);
         YAxisRenderer.drawYAxis(lcG2d, X_OFFSET_IN_PIXELS, Y_OFFSET_IN_PIXELS, this, mcDb);
     }
@@ -70,15 +71,15 @@ public class VmStatisticsPanel extends JPanel
      * @param anXOffset
      * @param anYOffset
      */
-    private void renderGraph(Graphics2D acG2d, Dimension acDimension, int anXOffset, int anYOffset)
+    private void renderGraph(Graphics2D acG2d, Dimension acDimension, int anXOffset, int anYOffset, Collection<VmMemoryStatistic> lcStats)
     {
         int lnCounter = 0;
-        for (VmMemoryStatistic lcMem : mcDb.GetMemoryStatistics())
+        for (VmMemoryStatistic lcMem : lcStats)
         {
-            int lnCommitRatioPixels = getPixelFromValue((int) acDimension.getHeight(), anXOffset, 0, lcMem.mrCommittedSizeMb, mcDb.getMaxHeapMb());
-            int lnEdenRatioPixels = getPixelFromValue((int) acDimension.getHeight(), anXOffset, 0, lcMem.mrEdenSizeMb, mcDb.getMaxHeapMb());
-            int lnSurvivorRatioPixels = getPixelFromValue((int) acDimension.getHeight(), anXOffset, 0, lcMem.mrSurvivorSizeMb, mcDb.getMaxHeapMb());
-            int lnOldRatioPixels = getPixelFromValue((int) acDimension.getHeight(), anXOffset, 0, lcMem.mrOldGenSizeMb, mcDb.getMaxHeapMb());
+            int lnCommitRatioPixels = getPixelFromValue((int) acDimension.getHeight(), anXOffset, 0, lcMem.mrCommittedSizeMb, lcMem.mrMaxSizeMb);
+            int lnEdenRatioPixels = getPixelFromValue((int) acDimension.getHeight(), anXOffset, 0, lcMem.mrEdenSizeMb, lcMem.mrMaxSizeMb);
+            int lnSurvivorRatioPixels = getPixelFromValue((int) acDimension.getHeight(), anXOffset, 0, lcMem.mrSurvivorSizeMb, lcMem.mrMaxSizeMb);
+            int lnOldRatioPixels = getPixelFromValue((int) acDimension.getHeight(), anXOffset, 0, lcMem.mrOldGenSizeMb, lcMem.mrMaxSizeMb);
 
             int lnBottom = acDimension.height - anYOffset;
             lnOldRatioPixels = lnBottom - lnOldRatioPixels;

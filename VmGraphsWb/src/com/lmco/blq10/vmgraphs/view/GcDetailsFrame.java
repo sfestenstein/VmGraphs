@@ -206,7 +206,6 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
 
                 mcGcListModel.addElement(lcBuilder.toString());
             }
-
             mnLastGcTimeMs = anCollectionTimeMs;
             mnCollectionCount = anCollectionCount;
             long lnCorrectedCollectionCount = mnCollectionCount - mnCollectionCountReset;

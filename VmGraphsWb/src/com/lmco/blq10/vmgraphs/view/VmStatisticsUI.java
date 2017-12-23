@@ -1,5 +1,7 @@
 package com.lmco.blq10.vmgraphs.view;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Map;
@@ -8,6 +10,7 @@ import java.util.Map.Entry;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -19,6 +22,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 
 import com.lmco.blq10.vmgraphs.model.IVmStatisticListener;
+import com.lmco.blq10.vmgraphs.model.VmFileUtils;
 import com.lmco.blq10.vmgraphs.model.VmGcListModel;
 import com.lmco.blq10.vmgraphs.model.VmGcStatistic;
 import com.lmco.blq10.vmgraphs.model.VmMemoryStatistic;
@@ -72,6 +76,8 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
      */
     private final VmGcListModel mcVmGcListModel;
 
+    private final VmFileUtils mcFileUtils;
+    JComboBox<String> mcHistoryDataComboBox;
     /**
      * Put the mcGcCollectionList in a scroll pane.  It's just good practice!
      */
@@ -83,11 +89,25 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
      *
      * @param acDb
      */
-    public VmStatisticsUI(VmStatisticDatabase acDb)
+    public VmStatisticsUI()
     {
-        mcDb = acDb;
+        mcFileUtils = new VmFileUtils("C:\\Users\\sifesten\\VmStats");
+        mcDb = new VmStatisticDatabase(30, mcFileUtils);
         mcVmGcListModel = new VmGcListModel();
         VmStatisticsPanel mcVmStatisticsGraphicsPanel = new VmStatisticsPanel(mcDb);
+        mcHistoryDataComboBox = mcFileUtils.getHistoryChooserComponent();
+
+        mcHistoryDataComboBox.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent acEvent)
+            {
+                if (((JComboBox<String>)acEvent.getSource()).getSelectedIndex() > 0)
+                {
+                    mcFileUtils.getSavedData();
+                }
+            }
+        });
 
         /**
          * Begin auto-generated code from Winbuilder Pro.  Do not modify any
@@ -120,6 +140,7 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
         mcGcCollectionPane.setViewportBorder(new TitledBorder(null, "GC Collection List", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         mcGcCollectionPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         mcGcCollectionPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
         GroupLayout gl_mcVmStatisticsTextPanel = new GroupLayout(mcVmStatisticsTextPanel);
         gl_mcVmStatisticsTextPanel.setHorizontalGroup(
             gl_mcVmStatisticsTextPanel.createParallelGroup(Alignment.TRAILING)
@@ -127,6 +148,7 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
                     .addContainerGap()
                     .addGroup(gl_mcVmStatisticsTextPanel.createParallelGroup(Alignment.TRAILING)
                         .addComponent(mcGcCollectionPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
+                        .addComponent(mcHistoryDataComboBox, Alignment.LEADING, 0, 209, Short.MAX_VALUE)
                         .addComponent(mcEdenGenLabel, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
                         .addComponent(mcSurvivorGenLabel, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
                         .addComponent(mcOldGenLabel, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
@@ -148,7 +170,9 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addComponent(mcMaxMemoryLabel, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(mcGcCollectionPane, GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
+                    .addComponent(mcGcCollectionPane, GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addComponent(mcHistoryDataComboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addContainerGap())
         );
 
