@@ -23,7 +23,7 @@ import javax.swing.JPanel;
  * @brief Gathers and maintains Memory Statistics from the Java Virtual Machine.
  *
  */
-public class VmStatisticDatabase
+public class VmStatisticDatabase implements IStatisticsDatabase
 {
     /**
      * Number of milliseconds to wait between polls of the Java Virtual Machine.
@@ -182,6 +182,7 @@ public class VmStatisticDatabase
      * Returns our current collection of memory statistics.
      * @return
      */
+    @Override
     public final Collection<VmMemoryStatistic> GetMemoryStatistics()
     {
         return mcMemoryStatistics;
@@ -239,6 +240,7 @@ public class VmStatisticDatabase
      * Getter for the latest collected Max Heap size in Megabytes
      * @return
      */
+    @Override
     public float getMaxHeapMb()
     {
         return mrMaxHeapMb;
@@ -248,6 +250,7 @@ public class VmStatisticDatabase
      * Getter for the latest collected Old Generation memory size in Megabytes.
      * @return
      */
+    @Override
     public float getOldMemMb()
     {
         return mrOldGenSizeMb;
@@ -257,6 +260,7 @@ public class VmStatisticDatabase
      * Getter for the latest collected Survivor Generation memory size in Megabytes.
      * @return
      */
+    @Override
     public float getSurvivorMemMb()
     {
         return mrSurvivorGenSizeMb;
@@ -266,6 +270,7 @@ public class VmStatisticDatabase
      * Getter for the latest collected Eden Generation memory size in Megabytes.
      * @return
      */
+    @Override
     public float getEdenMemMb()
     {
         return mrEdenGenSizeMb;
@@ -275,6 +280,7 @@ public class VmStatisticDatabase
      * Getter for the latest collected Committed memory size in Megabytes.
      * @return
      */
+    @Override
     public float getCommitMemMb()
     {
         return mrCommittedSizeMb;

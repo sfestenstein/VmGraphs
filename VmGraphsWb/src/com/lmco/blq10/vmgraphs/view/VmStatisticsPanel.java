@@ -8,8 +8,8 @@ import java.util.Collection;
 
 import javax.swing.JPanel;
 
+import com.lmco.blq10.vmgraphs.model.IStatisticsDatabase;
 import com.lmco.blq10.vmgraphs.model.VmMemoryStatistic;
-import com.lmco.blq10.vmgraphs.model.VmStatisticDatabase;
 
 /**
  * @class VmStatisticsPanel
@@ -35,13 +35,13 @@ public class VmStatisticsPanel extends JPanel
     /**
      * Virtual Machine Statistics database
      */
-    private final VmStatisticDatabase mcDb;
+    private final IStatisticsDatabase mcDb;
 
     /**
      * Constructor
      * @param acDb
      */
-    public VmStatisticsPanel(VmStatisticDatabase acDb)
+    public VmStatisticsPanel(IStatisticsDatabase acDb)
     {
         super();
         mcDb =acDb;

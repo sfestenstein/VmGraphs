@@ -7,8 +7,8 @@ import java.text.DecimalFormat;
 
 import javax.swing.JPanel;
 
+import com.lmco.blq10.vmgraphs.model.IStatisticsDatabase;
 import com.lmco.blq10.vmgraphs.model.VmMemoryStatistic;
-import com.lmco.blq10.vmgraphs.model.VmStatisticDatabase;
 
 /**
  * @class YAxisRenderer
@@ -36,7 +36,7 @@ public class YAxisRenderer
      * @param acPanel
      * @param acDb
      */
-    public static void drawYAxis(Graphics2D acGraphics, int anXOffset, int anYOffset, JPanel acPanel, VmStatisticDatabase acDb)
+    public static void drawYAxis(Graphics2D acGraphics, int anXOffset, int anYOffset, JPanel acPanel, IStatisticsDatabase acDb)
     {
         VmMemoryStatistic lcStat = new VmMemoryStatistic();
         lcStat.mrCommittedSizeMb = acDb.getCommitMemMb();
