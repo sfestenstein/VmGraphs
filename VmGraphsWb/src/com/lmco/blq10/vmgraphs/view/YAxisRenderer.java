@@ -84,10 +84,15 @@ public class YAxisRenderer
         int lnCommitMemPixel =  (int) (lrCommitMemRatio * (acPanel.getHeight()-anYOffset));
         lnCommitMemPixel = acPanel.getHeight() - (anYOffset + lnCommitMemPixel);
 
-        drawTick(acGraphics, (int) lrOldMem, anXOffset, lnOldMemPixel, acPanel);
-        drawTick(acGraphics, (int) lrSurvivorMem, anXOffset, lnSurvivorMemPixel, acPanel);
-        drawTick(acGraphics, (int) lrEdenMem, anXOffset, lnEdenMemPixel, acPanel);
-        drawTick(acGraphics, (int) lrCommitMem, anXOffset, lnCommitMemPixel, acPanel);
+        // fix lnOldPixel so we don't paint these two labels on top of each other.
+        if (lnOldMemPixel - lnEdenMemPixel < acGraphics.getFont().getSize())
+        {
+            lnEdenMemPixel = lnOldMemPixel - acGraphics.getFont().getSize();
+        }
+
+        drawTick(acGraphics, (int) lrOldMem, anXOffset, lnOldMemPixel, acPanel, Color.RED.darker());
+        drawTick(acGraphics, (int) lrEdenMem, anXOffset, lnEdenMemPixel, acPanel, Color.GREEN.darker());
+        drawTick(acGraphics, (int) lrCommitMem, anXOffset, lnCommitMemPixel, acPanel, Color.BLUE);
     }
     /**
      * Method to draw a tick on the x axis along with its label.
@@ -97,8 +102,15 @@ public class YAxisRenderer
      * @param anXOffset
      * @param anYOffset
      * @param acPanel
+     * @param acLabelColor
      */
-    private static void drawTick(Graphics2D acGraphics, int anMarkerValue, int anXOffset, int anYOffset, JPanel acPanel)
+    private static void drawTick(
+            Graphics2D acGraphics,
+            int anMarkerValue,
+            int anXOffset,
+            int anYOffset,
+            JPanel acPanel,
+            Color acLabelColor)
     {
 
         FontMetrics lcFontMetrics = acGraphics.getFontMetrics();
@@ -112,6 +124,8 @@ public class YAxisRenderer
 
         acGraphics.drawLine(anXOffset, anYOffset,
                             anXOffset-TICK_LENGTH_IN_PIXELS, anYOffset);
+
+        acGraphics.setColor(acLabelColor);
         acGraphics.drawString(lcMarkerLabel,
                               anXOffset/2 - (lnlabelWidth/2),
                               anYOffset + (lnlabelHeight/2));

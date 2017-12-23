@@ -93,13 +93,13 @@ public class VmStatisticsPanel extends JPanel
             acG2d.setColor(Color.BLUE);
             acG2d.drawLine(lnCounter+anXOffset, lnCommitRatioPixels, lnCounter+anXOffset, lnEdenRatioPixels);
 
-            acG2d.setColor(Color.GREEN);
+            acG2d.setColor(Color.GREEN.darker());
             acG2d.drawLine(lnCounter+anXOffset, lnSurvivorRatioPixels, lnCounter+anXOffset, lnEdenRatioPixels);
 
             acG2d.setColor(Color.YELLOW);
             acG2d.drawLine(lnCounter+anXOffset, lnSurvivorRatioPixels, lnCounter+anXOffset, lnOldRatioPixels);
 
-            acG2d.setColor(Color.RED);
+            acG2d.setColor(Color.RED.darker());
             acG2d.drawLine(lnCounter+anXOffset, lnBottom, lnCounter+anXOffset, lnOldRatioPixels);
 
             lnCounter++;
