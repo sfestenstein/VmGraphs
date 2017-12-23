@@ -77,6 +77,9 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
      */
     private final VmGcListModel mcVmGcListModel;
 
+    /**
+     * Utility to save off new data and load old data.
+     */
     private final VmFileUtils mcFileUtils;
 
     /**
@@ -97,9 +100,9 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
      * @param anCollectionIntervalMs - data collection period.
      * @param acSaveFileDirectory - base directory to save off old files.
      */
-    public VmStatisticsUI(int anNumStats, int anCollectionIntervalMs, String acSaveFileDirectory)
+    public VmStatisticsUI(int anNumStats, int anCollectionIntervalMs, String acSaveFileDirectory, int anMaxNumberOfFiles)
     {
-        mcFileUtils = new VmFileUtils(acSaveFileDirectory);
+        mcFileUtils = new VmFileUtils(acSaveFileDirectory, anMaxNumberOfFiles);
         mcDb = new VmStatisticDatabase(anNumStats, anCollectionIntervalMs, mcFileUtils);
         mcVmGcListModel = new VmGcListModel();
         VmStatisticsPanel mcVmStatisticsGraphicsPanel = new VmStatisticsPanel(mcDb);

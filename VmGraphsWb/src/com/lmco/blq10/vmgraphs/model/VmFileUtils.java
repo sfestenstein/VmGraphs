@@ -29,7 +29,7 @@ public class VmFileUtils
     /**
      * Maximum number of files that will be saved off at any time.
      */
-    private static final int MAX_NUM_FILES = 3;
+    private final int mnMaxNumFiles;
 
     /**
      * Date format for the list of long garbage collections.
@@ -50,9 +50,12 @@ public class VmFileUtils
      * Constructor
      *
      * @param acBaseDirectory
+     * @param anMaxNumberOfFiles - maximum number of files to keep around.
+     * Oldest ones get deleted to make room for new ones.
      */
-    public VmFileUtils(String acBaseDirectory)
+    public VmFileUtils(String acBaseDirectory, int anMaxNumberOfFiles)
     {
+        mnMaxNumFiles = anMaxNumberOfFiles;
         mcBaseDirectory = acBaseDirectory;
         updateComboBox();
     }
@@ -158,9 +161,9 @@ public class VmFileUtils
         File lcFolder = new File(mcBaseDirectory);
         File[] lacFiles = lcFolder.listFiles();
 
-        if (lacFiles.length > MAX_NUM_FILES)
+        if (lacFiles.length > mnMaxNumFiles)
         {
-            for (int lnI = 0; lnI < (lacFiles.length - MAX_NUM_FILES); lnI++)
+            for (int lnI = 0; lnI < (lacFiles.length - mnMaxNumFiles); lnI++)
             {
                 lacFiles[lnI].delete();
             }
