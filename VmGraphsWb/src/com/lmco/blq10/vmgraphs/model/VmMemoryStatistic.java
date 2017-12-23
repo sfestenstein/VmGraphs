@@ -9,7 +9,8 @@ import java.io.Serializable;
 public class VmMemoryStatistic implements Serializable
 {
     /**
-     *
+     * Serial Version ID.  NECESSARY!!!!  Objects of this type are saved to
+     * and loaded from a file, file utils assumes this is a serializable class.
      */
     private static final long serialVersionUID = 7756525984129702378L;
 

@@ -78,7 +78,12 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
     private final VmGcListModel mcVmGcListModel;
 
     private final VmFileUtils mcFileUtils;
+
+    /**
+     * Combo box used to select saved off data and display them
+     */
     JComboBox<String> mcHistoryDataComboBox;
+
     /**
      * Put the mcGcCollectionList in a scroll pane.  It's just good practice!
      */
@@ -88,7 +93,9 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
     /**
      * Constructor
      *
-     * @param acDb
+     * @param anNumStats - Max number of statistics to display and save off.
+     * @param anCollectionIntervalMs - data collection period.
+     * @param acSaveFileDirectory - base directory to save off old files.
      */
     public VmStatisticsUI(int anNumStats, int anCollectionIntervalMs, String acSaveFileDirectory)
     {
@@ -200,6 +207,7 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
         /**
          * End Auto-Generated code
          */
+
         mcDb.registerStatisticsListener(this);
         mcGcCollectionList.addMouseListener(new MouseAdapter()
         {
@@ -218,7 +226,6 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
                 }
             }
         });
-
     }
 
     /**

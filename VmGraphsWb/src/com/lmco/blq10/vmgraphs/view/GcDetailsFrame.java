@@ -24,7 +24,7 @@ import com.lmco.blq10.vmgraphs.model.IGcDetailsListener;
 
 /**
  * @class GcDetailsFrame
- * @brief JFrame to display Garbage Collection information
+ * @brief JFrame to display Garbage Collection information.
  *
  */
 @SuppressWarnings("serial")

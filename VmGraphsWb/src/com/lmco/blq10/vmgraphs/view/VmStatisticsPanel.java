@@ -37,8 +37,10 @@ public class VmStatisticsPanel extends JPanel
      */
     private final IStatisticsDatabase mcDb;
 
+
     /**
      * Constructor
+     *
      * @param acDb
      */
     public VmStatisticsPanel(IStatisticsDatabase acDb)
@@ -46,7 +48,6 @@ public class VmStatisticsPanel extends JPanel
         super();
         mcDb =acDb;
     }
-
 
     /**
      * Called to repaint this component.

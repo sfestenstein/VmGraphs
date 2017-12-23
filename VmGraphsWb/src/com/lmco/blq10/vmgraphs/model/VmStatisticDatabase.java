@@ -37,10 +37,6 @@ public class VmStatisticDatabase implements IStatisticsDatabase
 
     /**
      * Maximum number of statistics held in this database.
-     *
-     * ** Future Work **
-     * It would be nice if this number were configurable and we were able to
-     * save off statistics to a file and then be able to load them offine.
      */
     private final int mnNumStatistics;
 
@@ -49,14 +45,6 @@ public class VmStatisticDatabase implements IStatisticsDatabase
      */
     private final Deque <VmMemoryStatistic> mcMemoryStatistics =
             new LinkedBlockingDeque<VmMemoryStatistic>();
-
-    /**
-     * Actual Collection of Garbage Collection statistics.
-     *
-     * **Future Work**
-     * This member may not be critical.
-     */
-    private final Deque <VmGcStatistic> mcGcStatistics = new LinkedBlockingDeque<VmGcStatistic>();
 
     /**
      * Collection of everyone interested in updates to this database.
@@ -117,7 +105,11 @@ public class VmStatisticDatabase implements IStatisticsDatabase
      */
     private float mrCommittedSizeMb = -1;
 
+    /**
+     * File Utils to save off data.
+     */
     private final VmFileUtils mcFileUtils;
+
     /**
      * collection of the latest Grabage Collection data for each collection
      * type (ParNew, ConcurrentMarkSweep, etc.).
@@ -130,7 +122,6 @@ public class VmStatisticDatabase implements IStatisticsDatabase
      */
     private final Map<String, IGcDetailsListener> mcGcDetailsListenerMap =
             new TreeMap<String, IGcDetailsListener>();
-
 
     /**
      * Constructor
@@ -304,7 +295,6 @@ public class VmStatisticDatabase implements IStatisticsDatabase
         public void run()
         {
             VmMemoryStatistic lcMemoryStatistic;
-            VmGcStatistic lcGcStatistic;
 
             // If we are above the maximum number of Memory statics,
             // recycle the oldest, otherwise new one up.
@@ -315,17 +305,6 @@ public class VmStatisticDatabase implements IStatisticsDatabase
             else
             {
                 lcMemoryStatistic = new VmMemoryStatistic();
-            }
-
-            // If we are above the maximum number of Garbage Collection statics,
-            // recycle the oldest, otherwise new one up.
-            if (mcGcStatistics.size() >= mnNumStatistics)
-            {
-                lcGcStatistic = mcGcStatistics.pollLast();
-            }
-            else
-            {
-                lcGcStatistic = new VmGcStatistic();
             }
 
             // Get latest Garbage Collection information and populate our
@@ -383,7 +362,6 @@ public class VmStatisticDatabase implements IStatisticsDatabase
             mrEdenGenSizeMb = lcMemoryStatistic.mrEdenSizeMb;
 
             // Push statistics into our internal Deques
-            mcGcStatistics.addFirst(lcGcStatistic);
             mcMemoryStatistics.addFirst(lcMemoryStatistic);
 
             // Now, update everyone who cares about this stuff.
@@ -399,15 +377,12 @@ public class VmStatisticDatabase implements IStatisticsDatabase
 
     private class FileSaveOffTask extends TimerTask
     {
-//        VmFileUtils mcFileUtils = new VmFileUtils("C:\\Users\\sifesten\\VmStats");
-
         /**
          * method called when this timer task is executed.
          */
         @Override
         public void run()
         {
-            System.out.println("Saving Stats");
             mcFileUtils.saveOffMemoryStats(mcMemoryStatistics);
         }
     }

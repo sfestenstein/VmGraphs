@@ -2,9 +2,13 @@ package com.lmco.blq10.vmgraphs.model;
 
 import java.util.Collection;
 
+/**
+ * @interface
+ * @brief Interface for anyone who is interested in memory statistics.
+ *
+ */
 public interface IStatisticsDatabase
 {
-
     /**
      * Getter for the latest collected Max Heap size in Megabytes
      * @return

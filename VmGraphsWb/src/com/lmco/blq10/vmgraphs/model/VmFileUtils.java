@@ -94,19 +94,19 @@ public class VmFileUtils
             {
                 lcOos.close();
             }
-/*            for (VmMemoryStatistic lcStat : acVmStats)
-            {
-                lcOos.writeObject(lcStat);
-            }
-            lcOos.close();*/
         } catch (IOException e)
         {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         updateComboBox();
     }
 
+    /**
+     * Gets the saved off data associated with the file selected from
+     * the mcComboBox.
+     *
+     * @return
+     */
     public Collection<VmMemoryStatistic> getSavedData()
     {
         String lcFilename = (String) mcFileComboBox.getSelectedItem();
@@ -149,6 +149,7 @@ public class VmFileUtils
         return lcSavedData;
 
     }
+
     /**
      * Updates the combo box, necessary for when new files have been saved.
      */
@@ -174,7 +175,6 @@ public class VmFileUtils
             if (lacFiles[i].isFile())
             {
                 mcFileComboBox.addItem(lacFiles[i].getName());
-                System.out.println("File " + lacFiles[i] + " " + lacFiles[i].getName());
             }
         }
     }
