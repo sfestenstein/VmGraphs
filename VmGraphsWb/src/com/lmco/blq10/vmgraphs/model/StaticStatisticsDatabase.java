@@ -2,12 +2,17 @@ package com.lmco.blq10.vmgraphs.model;
 
 import java.util.Collection;
 
-public class FileStatisticsDatabase implements IStatisticsDatabase
+/**
+ * @class FileStatisticsDatabase
+ * @brief .
+ *
+ */
+public class StaticStatisticsDatabase implements IStatisticsDatabase
 {
     private final Collection<VmMemoryStatistic> mcMemoryStatistics;
     private VmMemoryStatistic mcLatestMemoryStatistic;
 
-    public FileStatisticsDatabase(Collection<VmMemoryStatistic> acMemoryStatistics)
+    public StaticStatisticsDatabase(Collection<VmMemoryStatistic> acMemoryStatistics)
     {
         mcMemoryStatistics = acMemoryStatistics;
         mcLatestMemoryStatistic = new VmMemoryStatistic();

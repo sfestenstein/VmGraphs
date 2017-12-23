@@ -21,8 +21,8 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 
-import com.lmco.blq10.vmgraphs.model.FileStatisticsDatabase;
 import com.lmco.blq10.vmgraphs.model.IVmStatisticListener;
+import com.lmco.blq10.vmgraphs.model.StaticStatisticsDatabase;
 import com.lmco.blq10.vmgraphs.model.VmFileUtils;
 import com.lmco.blq10.vmgraphs.model.VmGcListModel;
 import com.lmco.blq10.vmgraphs.model.VmGcStatistic;
@@ -106,8 +106,8 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
             {
                 if (((JComboBox<String>)acEvent.getSource()).getSelectedIndex() > 0)
                 {
-                    FileStatisticsDatabase lcFileStatisticsDatabase = new
-                            FileStatisticsDatabase(mcFileUtils.getSavedData());
+                    StaticStatisticsDatabase lcFileStatisticsDatabase = new
+                            StaticStatisticsDatabase(mcFileUtils.getSavedData());
                     VmStatisticsPanel lcStatPanel = new VmStatisticsPanel(lcFileStatisticsDatabase);
                     JFrame lcNewFrame = new JFrame();
                     lcNewFrame.setTitle((String) ((JComboBox<String>)acEvent.getSource()).getSelectedItem());
