@@ -45,7 +45,6 @@ public class VmStatisticsPanel extends JPanel
     {
         super();
         mcDb =acDb;
-        mcDb.registerRefreshPanel(this);
     }
 
 

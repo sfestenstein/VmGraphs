@@ -91,11 +91,11 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
      */
     public VmStatisticsUI(int anNumStats, int anCollectionIntervalMs, String acSaveFileDirectory)
     {
-//        mcFileUtils = new VmFileUtils("C:\\Users\\sifesten\\VmStats");
         mcFileUtils = new VmFileUtils(acSaveFileDirectory);
         mcDb = new VmStatisticDatabase(anNumStats, anCollectionIntervalMs, mcFileUtils);
         mcVmGcListModel = new VmGcListModel();
         VmStatisticsPanel mcVmStatisticsGraphicsPanel = new VmStatisticsPanel(mcDb);
+        mcDb.registerRefreshPanel(mcVmStatisticsGraphicsPanel);
         mcHistoryDataComboBox = mcFileUtils.getHistoryChooserComponent();
 
         mcHistoryDataComboBox.addActionListener(new ActionListener()
