@@ -148,9 +148,7 @@ public class VmFileUtils
             e.printStackTrace();
         }
 
-        System.out.println("lcSavedData size = " + lcSavedData.size());
         return lcSavedData;
-
     }
 
     /**
