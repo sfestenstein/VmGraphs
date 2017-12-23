@@ -8,7 +8,7 @@ public class VmGraphsMain
 {
     public static void main (String[] args)
     {
-        VmStatisticsUI lcStatisticsUI = new VmStatisticsUI();
+        VmStatisticsUI lcStatisticsUI = new VmStatisticsUI(300, 100, "C:\\Users\\sifesten\\VmStats");
         lcStatisticsUI.setVisible(true);
         lcStatisticsUI.setSize(1275, 400);
         lcStatisticsUI.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

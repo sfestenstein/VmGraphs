@@ -28,7 +28,7 @@ public class VmStatisticDatabase
     /**
      * Number of milliseconds to wait between polls of the Java Virtual Machine.
      */
-    private static int POLLING_INTERVAL_MS = 1000;
+    private final int mnPollingIntervalMs;
 
     /**
      * Useful constant since statistics are in bytes.
@@ -135,17 +135,20 @@ public class VmStatisticDatabase
     /**
      * Constructor
      */
-    public VmStatisticDatabase(int anNumStatistics, VmFileUtils acFileUtils)
+    public VmStatisticDatabase(int anNumStatistics, int anCollectionIntervalMs, VmFileUtils acFileUtils)
     {
         mcFileUtils = acFileUtils;
         mnNumStatistics = anNumStatistics;
+        mnPollingIntervalMs = anCollectionIntervalMs;
         mcPollVmTimer = new Timer();
         mcCollectionTask = new VmCollectionTask();
-        mcPollVmTimer.schedule(mcCollectionTask, POLLING_INTERVAL_MS,POLLING_INTERVAL_MS);
+        mcPollVmTimer.schedule(mcCollectionTask, mnPollingIntervalMs,mnPollingIntervalMs);
 
         mcFileSaveTimer = new Timer();
         mcFileSaveTask = new FileSaveOffTask();
-        mcFileSaveTimer.schedule(mcFileSaveTask, mnNumStatistics*1000, mnNumStatistics*1000);
+        mcFileSaveTimer.schedule(mcFileSaveTask,
+                mnPollingIntervalMs*anNumStatistics,
+                mnPollingIntervalMs*anNumStatistics);
     }
 
     /**
