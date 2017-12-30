@@ -7,7 +7,6 @@ import java.awt.event.MouseEvent;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JComboBox;
@@ -18,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 
@@ -91,6 +91,10 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
      * Put the mcGcCollectionList in a scroll pane.  It's just good practice!
      */
     private final JScrollPane mcGcCollectionPane;
+    private JLabel lblSurvivorGenMb;
+    private JLabel lblOldGenMb;
+    private JLabel lblCommittedMb;
+    private JLabel lblMaxHeapMb;
 
 
     /**
@@ -120,7 +124,7 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
                     VmStatisticsPanel lcStatPanel = new VmStatisticsPanel(lcFileStatisticsDatabase);
                     JFrame lcNewFrame = new JFrame();
                     lcNewFrame.setTitle((String) ((JComboBox<String>)acEvent.getSource()).getSelectedItem());
-                    lcNewFrame.add(lcStatPanel);
+                    lcNewFrame.getContentPane().add(lcStatPanel);
                     lcNewFrame.setSize(anNumStats+45, 400);
                     lcNewFrame.setVisible(true);
                 }
@@ -149,59 +153,91 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
         );
 
         mcOldGenLabel = new JLabel("---");
+        mcOldGenLabel.setHorizontalAlignment(SwingConstants.TRAILING);
         mcSurvivorGenLabel = new JLabel("---");
+        mcSurvivorGenLabel.setHorizontalAlignment(SwingConstants.TRAILING);
         mcEdenGenLabel = new JLabel("---");
+        mcEdenGenLabel.setHorizontalAlignment(SwingConstants.TRAILING);
         mcCommittedMemLabel = new JLabel("---");
+        mcCommittedMemLabel.setHorizontalAlignment(SwingConstants.TRAILING);
         mcMaxMemoryLabel = new JLabel("---");
+        mcMaxMemoryLabel.setHorizontalAlignment(SwingConstants.TRAILING);
 
         mcGcCollectionPane = new JScrollPane();
         mcGcCollectionPane.setViewportBorder(new TitledBorder(null, "GC Collection List", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         mcGcCollectionPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         mcGcCollectionPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
+        JLabel lblEdenGenMb = new JLabel("Eden Gen MB");
+
+        lblSurvivorGenMb = new JLabel("Survivor Gen MB");
+
+        lblOldGenMb = new JLabel("Old Gen MB");
+
+        lblCommittedMb = new JLabel("Committed MB");
+
+        lblMaxHeapMb = new JLabel("Max Heap MB");
+
         GroupLayout gl_mcVmStatisticsTextPanel = new GroupLayout(mcVmStatisticsTextPanel);
         gl_mcVmStatisticsTextPanel.setHorizontalGroup(
             gl_mcVmStatisticsTextPanel.createParallelGroup(Alignment.TRAILING)
                 .addGroup(gl_mcVmStatisticsTextPanel.createSequentialGroup()
                     .addContainerGap()
-                    .addGroup(gl_mcVmStatisticsTextPanel.createParallelGroup(Alignment.TRAILING)
-                        .addComponent(mcGcCollectionPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
-                        .addComponent(mcHistoryDataComboBox, Alignment.LEADING, 0, 209, Short.MAX_VALUE)
-                        .addComponent(mcEdenGenLabel, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
-                        .addComponent(mcSurvivorGenLabel, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
-                        .addComponent(mcOldGenLabel, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
-                        .addComponent(mcCommittedMemLabel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
-                        .addComponent(mcMaxMemoryLabel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE))
-                    .addGap(10))
+                    .addGroup(gl_mcVmStatisticsTextPanel.createParallelGroup(Alignment.LEADING)
+                        .addGroup(Alignment.TRAILING, gl_mcVmStatisticsTextPanel.createSequentialGroup()
+                            .addGroup(gl_mcVmStatisticsTextPanel.createParallelGroup(Alignment.LEADING)
+                                .addGroup(gl_mcVmStatisticsTextPanel.createSequentialGroup()
+                                    .addComponent(lblEdenGenMb)
+                                    .addPreferredGap(ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
+                                    .addComponent(mcEdenGenLabel, GroupLayout.PREFERRED_SIZE, 94, GroupLayout.PREFERRED_SIZE))
+                                .addComponent(mcGcCollectionPane, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
+                                .addComponent(mcHistoryDataComboBox, 0, 209, Short.MAX_VALUE))
+                            .addGap(10))
+                        .addGroup(Alignment.TRAILING, gl_mcVmStatisticsTextPanel.createSequentialGroup()
+                            .addGroup(gl_mcVmStatisticsTextPanel.createParallelGroup(Alignment.LEADING)
+                                .addComponent(lblSurvivorGenMb)
+                                .addComponent(lblOldGenMb)
+                                .addComponent(lblCommittedMb)
+                                .addComponent(lblMaxHeapMb))
+                            .addPreferredGap(ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
+                            .addGroup(gl_mcVmStatisticsTextPanel.createParallelGroup(Alignment.LEADING, false)
+                                .addComponent(mcMaxMemoryLabel, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(mcCommittedMemLabel, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(mcOldGenLabel, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(mcSurvivorGenLabel, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE))
+                            .addContainerGap())))
         );
         gl_mcVmStatisticsTextPanel.setVerticalGroup(
             gl_mcVmStatisticsTextPanel.createParallelGroup(Alignment.LEADING)
                 .addGroup(gl_mcVmStatisticsTextPanel.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(mcEdenGenLabel, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(mcSurvivorGenLabel)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(mcOldGenLabel)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(mcCommittedMemLabel, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(mcMaxMemoryLabel, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(mcGcCollectionPane, GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
-                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addGroup(gl_mcVmStatisticsTextPanel.createParallelGroup(Alignment.BASELINE)
+                        .addComponent(mcEdenGenLabel)
+                        .addComponent(lblEdenGenMb))
+                    .addGroup(gl_mcVmStatisticsTextPanel.createParallelGroup(Alignment.BASELINE)
+                        .addComponent(mcSurvivorGenLabel)
+                        .addComponent(lblSurvivorGenMb))
+                    .addGroup(gl_mcVmStatisticsTextPanel.createParallelGroup(Alignment.BASELINE)
+                        .addComponent(mcOldGenLabel)
+                        .addComponent(lblOldGenMb))
+                    .addGroup(gl_mcVmStatisticsTextPanel.createParallelGroup(Alignment.BASELINE)
+                        .addComponent(mcCommittedMemLabel)
+                        .addComponent(lblCommittedMb))
+                    .addGroup(gl_mcVmStatisticsTextPanel.createParallelGroup(Alignment.BASELINE)
+                        .addComponent(mcMaxMemoryLabel)
+                        .addComponent(lblMaxHeapMb))
+                    .addComponent(mcGcCollectionPane, GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
                     .addComponent(mcHistoryDataComboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap())
+                    )
         );
 
         mcGcCollectionList = new JList();
         mcGcCollectionList.setModel(mcVmGcListModel);
         mcGcCollectionPane.setViewportView(mcGcCollectionList);
-        mcOldGenLabel.setBorder(BorderFactory.createTitledBorder("Old Gen Memory Mb"));
-        mcSurvivorGenLabel.setBorder(BorderFactory.createTitledBorder("Survivor Gen Memory Mb"));
-        mcEdenGenLabel.setBorder(BorderFactory.createTitledBorder("Eden Gen Memory Mb"));
-        mcCommittedMemLabel.setBorder(BorderFactory.createTitledBorder("Committed Memory Mb"));
-        mcMaxMemoryLabel.setBorder(BorderFactory.createTitledBorder("Maximum Memory Mb"));
+        mcOldGenLabel.setBorder(null);
+        mcSurvivorGenLabel.setBorder(null);
+        mcEdenGenLabel.setBorder(null);
+        mcCommittedMemLabel.setBorder(null);
+        mcMaxMemoryLabel.setBorder(null);
 
         mcVmStatisticsTextPanel.setLayout(gl_mcVmStatisticsTextPanel);
         getContentPane().setLayout(groupLayout);
