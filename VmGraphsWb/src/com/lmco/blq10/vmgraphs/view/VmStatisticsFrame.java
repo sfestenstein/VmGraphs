@@ -30,39 +30,119 @@ import com.lmco.blq10.vmgraphs.model.VmGcStatistic;
 import com.lmco.blq10.vmgraphs.model.VmMemoryStatistic;
 import com.lmco.blq10.vmgraphs.model.VmStatisticDatabase;
 
+/**
+ * @class VmStatisticsFrame
+ * @brief Top level frame to hold all VM Visualiztion components.
+ *
+ */
+@SuppressWarnings("serial")
 public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
 {
+    /**
+     * This frame is split into to parts, the graph area and the text area.
+     */
     JSplitPane mcSplitPane;
 
+    /**
+     * Panel to display graphical memory usage.
+     */
     JPanel mcGraphPanel;
+
+    /**
+     * Panel to display text-based information.
+     */
     JPanel mcTextPanel;
 
+    /**
+     * Label to indicate Eden Generation Memory.
+     */
     JLabel mcEdenGenLabel;
+
+    /**
+     * Label to hold the value of the current Eden Gen Memory Usage.
+     */
     JLabel mcEdenGenValue;
 
+    /**
+     * Label to indicate Survivor Generation Memory.
+     */
     JLabel mcSurvivorGenLabel;
+
+    /**
+     * Label to hold the value of the current Survivor Gen Memory Usage.
+     */
     JLabel mcSurvivorGenValue;
 
+    /**
+     * Label to indicate Old Generation Memory.
+     */
     JLabel mcOldGenLabel;
+
+    /**
+     * Label to hold the value of the current Old Gen Memory Usage.
+     */
     JLabel mcOldGenValue;
 
+    /**
+     * Label to indicate Committed Memory.
+     */
     JLabel mcCommittedLabel;
+
+    /**
+     * Label to hold the value of the current Committed Memory
+     */
     JLabel mcCommittedValue;
 
+    /**
+     * Label to indicate Max Heap.
+     */
     JLabel mcMaxHeapLabel;
+
+    /**
+     * Label to hold the value of the Max Heap
+     */
     JLabel mcMaxHeapValue;
 
+    /**
+     * Label to show garbage collection info.
+     */
     JLabel mcGcTextInfo;
 
+    /**
+     * Button to reset GC Statistics
+     */
     JButton mcResetGcStats;
+
+    /**
+     * Button to force a GC.
+     */
     JButton mcForceGcButton;
 
+    /**
+     * Slider to select GC Log Threshold in ms.
+     */
     JSlider mcThresholdSlider;
+
+    /**
+     * Combo box to hold saved off data.
+     */
     JComboBox mcHistoryDataComboBox;
 
+    /**
+     * Group layout of the main Pane
+     */
+    GroupLayout mcMainGroupLayout = new GroupLayout(getContentPane());
+
+    /**
+     * List model to hold GC Logs
+     */
     DefaultListModel<String> mcGcLogListModel = new DefaultListModel<String>();
 
+    /**
+     * Helper class to determine GC Visualisations.
+     */
     GcDetailsCollector mcGcDetails = new GcDetailsCollector();
+
     /**
      * Virtual Machine statistics database.
      */
@@ -72,12 +152,30 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
      * Utility to save off new data and load old data.
      */
     private final VmFileUtils mcFileUtils;
-    private JScrollPane scrollPane;
-    private JList mcGcLogList;
-//    private JPanel mcVmStatisticsGraph;
 
+    /**
+     * Scroll Pane to hold the GC Log list.
+     */
+    private JScrollPane mcScrollPane;
+
+    /**
+     * GC Log List
+     */
+    private JList mcGcLogList;
+
+    /**
+     * Constructor
+     *
+     * @param anNumStats
+     * @param anCollectionIntervalMs
+     * @param acSaveFileDirectory
+     * @param anMaxNumberOfFiles
+     */
     public VmStatisticsFrame(int anNumStats, int anCollectionIntervalMs, String acSaveFileDirectory, int anMaxNumberOfFiles)
     {
+        /**
+         * Set up basic objects.
+         */
         mcHistoryDataComboBox = new JComboBox();
         mcFileUtils = new VmFileUtils(acSaveFileDirectory, anMaxNumberOfFiles, mcHistoryDataComboBox);
         mcDb = new VmStatisticDatabase(anNumStats, anCollectionIntervalMs, mcFileUtils);
@@ -87,6 +185,56 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
         mcGraphPanel = new VmStatisticsPanel(mcDb);
         mcDb.registerRefreshPanel(mcGraphPanel);
 
+        /**
+         * New up Swing componenets
+         */
+        mcSplitPane = new JSplitPane();
+        mcSplitPane.setContinuousLayout(true);
+        mcTextPanel = new JPanel();
+        mcEdenGenLabel = new JLabel("Eden Gen MB");
+        mcEdenGenValue = new JLabel("---");
+        mcSurvivorGenLabel = new JLabel("Survivor Gen MB");
+        mcSurvivorGenValue = new JLabel("---");
+        mcOldGenLabel = new JLabel("Old Gen MB");
+        mcOldGenValue = new JLabel("---");
+        mcCommittedLabel = new JLabel("Committed MB");
+        mcCommittedValue = new JLabel("---");
+        mcMaxHeapLabel = new JLabel("Max Heap MB");
+        mcMaxHeapValue = new JLabel("---");
+        mcGcTextInfo = new JLabel("GC Count = --- / Ave Time MS = ---");
+        mcResetGcStats = new JButton("Reset GC Stats");
+        mcForceGcButton = new JButton("Force GC");
+        mcThresholdSlider = new JSlider();
+        mcScrollPane = new JScrollPane();
+        GroupLayout lcTextPanelGroupLayout = new GroupLayout(mcTextPanel);
+        mcMainGroupLayout = new GroupLayout(getContentPane());
+        mcGcLogList = new JList();
+
+        mcThresholdSlider.setBorder(new TitledBorder(null, "Gc Log Threshold ms", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        mcThresholdSlider.setPaintLabels(true);
+        mcThresholdSlider.setPaintTicks(true);
+        mcThresholdSlider.setSnapToTicks(true);
+        mcThresholdSlider.setMinorTickSpacing(50);
+        mcThresholdSlider.setMajorTickSpacing(250);
+        mcThresholdSlider.setValue(150);
+        mcThresholdSlider.setMaximum(1000);
+        mcScrollPane.setViewportView(mcGcLogList);
+
+        /**
+         * Now arrange everything
+         */
+        arrangeGroupLayout(lcTextPanelGroupLayout);
+        getContentPane().setLayout(mcMainGroupLayout);
+        mcTextPanel.setLayout(lcTextPanelGroupLayout);
+
+        /**
+         * Set models
+         */
+        mcGcLogList.setModel(mcGcLogListModel);
+
+        /**
+         * Add action listeners to a few componenets.
+         */
         mcHistoryDataComboBox.addActionListener(new ActionListener()
         {
             @Override
@@ -106,19 +254,50 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
             }
         });
 
-        mcSplitPane = new JSplitPane();
-        mcSplitPane.setContinuousLayout(true);
+        mcResetGcStats.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                mcGcDetails.reset();
+                mcGcLogListModel.clear();
+            }
+        });
 
-        /*
-         * Begin Autogen code.
+        mcForceGcButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                System.gc();
+            }
+        });
+
+        /**
+         * Let's precisely size this frame.
          */
-        GroupLayout groupLayout = new GroupLayout(getContentPane());
-        groupLayout.setHorizontalGroup(
-            groupLayout.createParallelGroup(Alignment.LEADING)
+        int lnGraphSize = 45+anNumStats+1;
+        int lnTextSize = 275;
+        setSize(lnGraphSize+lnTextSize, 450);
+        mcSplitPane.setDividerLocation(lnGraphSize);
+        setResizable(false);
+    }
+
+    /**
+     * Arranges all the componenets in this frame using group layouts.
+     * This code is mostly auto-generated from Window Builder.  Do not modify
+     * this code unless you really know what you are doing.
+     *
+     * @param acTextPanelGroupLayout
+     */
+    private void arrangeGroupLayout(GroupLayout acTextPanelGroupLayout)
+    {
+        mcMainGroupLayout.setHorizontalGroup(
+                mcMainGroupLayout.createParallelGroup(Alignment.LEADING)
                 .addComponent(mcSplitPane, GroupLayout.DEFAULT_SIZE, 900, Short.MAX_VALUE)
         );
-        groupLayout.setVerticalGroup(
-            groupLayout.createParallelGroup(Alignment.LEADING)
+        mcMainGroupLayout.setVerticalGroup(
+                mcMainGroupLayout.createParallelGroup(Alignment.LEADING)
                 .addComponent(mcSplitPane, GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)
         );
 
@@ -134,81 +313,43 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
         );
         mcGraphPanel.setLayout(gl_mcGraphPanel);
 
-        mcTextPanel = new JPanel();
         mcTextPanel.setPreferredSize(new Dimension(250, 10));
         mcSplitPane.setRightComponent(mcTextPanel);
-
-        mcEdenGenLabel = new JLabel("Eden Gen MB");
-
-        mcEdenGenValue = new JLabel("---");
         mcEdenGenValue.setHorizontalAlignment(SwingConstants.TRAILING);
-
-        mcSurvivorGenLabel = new JLabel("Survivor Gen MB");
-
-        mcSurvivorGenValue = new JLabel("---");
         mcSurvivorGenValue.setHorizontalAlignment(SwingConstants.TRAILING);
-
-        mcOldGenLabel = new JLabel("Old Gen MB");
-
-        mcOldGenValue = new JLabel("---");
         mcOldGenValue.setHorizontalAlignment(SwingConstants.TRAILING);
-
-        mcCommittedLabel = new JLabel("Committed MB");
-
-        mcCommittedValue = new JLabel("---");
         mcCommittedValue.setHorizontalAlignment(SwingConstants.TRAILING);
-
-        mcMaxHeapLabel = new JLabel("Max Heap MB");
-
-        mcMaxHeapValue = new JLabel("---");
         mcMaxHeapValue.setHorizontalAlignment(SwingConstants.TRAILING);
-
-        mcGcTextInfo = new JLabel("GC Count = --- / Ave Time MS = ---");
         mcGcTextInfo.setHorizontalAlignment(SwingConstants.TRAILING);
 
-        mcResetGcStats = new JButton("Reset GC Stats");
-        mcForceGcButton = new JButton("Force GC");
-
-        mcThresholdSlider = new JSlider();
-        mcThresholdSlider.setBorder(new TitledBorder(null, "Gc Log Threshold ms", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        mcThresholdSlider.setPaintLabels(true);
-        mcThresholdSlider.setPaintTicks(true);
-        mcThresholdSlider.setSnapToTicks(true);
-        mcThresholdSlider.setMinorTickSpacing(50);
-        mcThresholdSlider.setMajorTickSpacing(250);
-        mcThresholdSlider.setValue(150);
-        mcThresholdSlider.setMaximum(1000);
-
-        scrollPane = new JScrollPane();
-        GroupLayout gl_mcTextPanel = new GroupLayout(mcTextPanel);
-        gl_mcTextPanel.setHorizontalGroup(
-            gl_mcTextPanel.createParallelGroup(Alignment.TRAILING)
-                .addGroup(gl_mcTextPanel.createSequentialGroup()
+        acTextPanelGroupLayout.setHorizontalGroup(
+            acTextPanelGroupLayout.createParallelGroup(Alignment.TRAILING)
+                .addGroup(acTextPanelGroupLayout.createSequentialGroup()
                     .addContainerGap()
-                    .addGroup(gl_mcTextPanel.createParallelGroup(Alignment.TRAILING)
-                        .addComponent(scrollPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
+                    .addGroup(acTextPanelGroupLayout.createParallelGroup(Alignment.TRAILING)
+                        .addComponent(mcScrollPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
                         .addComponent(mcThresholdSlider, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
-                        .addGroup(Alignment.LEADING, gl_mcTextPanel.createSequentialGroup()
+                        .addGroup(Alignment.LEADING, acTextPanelGroupLayout.createSequentialGroup()
                             .addComponent(mcEdenGenLabel)
                             .addPreferredGap(ComponentPlacement.RELATED, 149, Short.MAX_VALUE)
                             .addComponent(mcEdenGenValue, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE))
-                        .addGroup(Alignment.LEADING, gl_mcTextPanel.createSequentialGroup()
+                        .addGroup(Alignment.LEADING, acTextPanelGroupLayout.createSequentialGroup()
                             .addComponent(mcSurvivorGenLabel)
                             .addPreferredGap(ComponentPlacement.RELATED, 181, Short.MAX_VALUE)
                             .addComponent(mcSurvivorGenValue))
-                        .addGroup(Alignment.LEADING, gl_mcTextPanel.createSequentialGroup()
+                        .addGroup(Alignment.LEADING, acTextPanelGroupLayout.createSequentialGroup()
                             .addComponent(mcOldGenLabel)
                             .addPreferredGap(ComponentPlacement.RELATED, 205, Short.MAX_VALUE)
                             .addComponent(mcOldGenValue))
-                        .addGroup(Alignment.LEADING, gl_mcTextPanel.createSequentialGroup()
+                        .addGroup(Alignment.LEADING, acTextPanelGroupLayout.createSequentialGroup()
                             .addComponent(mcCommittedLabel)
                             .addPreferredGap(ComponentPlacement.RELATED, 192, Short.MAX_VALUE)
                             .addComponent(mcCommittedValue))
-                        .addGroup(Alignment.LEADING, gl_mcTextPanel.createSequentialGroup()
+                        .addGroup(Alignment.LEADING, acTextPanelGroupLayout.createSequentialGroup()
                             .addComponent(mcMaxHeapLabel)
                             .addPreferredGap(ComponentPlacement.RELATED, 195, Short.MAX_VALUE)
                             .addComponent(mcMaxHeapValue))
-                        .addGroup(Alignment.LEADING, gl_mcTextPanel.createSequentialGroup()
+                        .addGroup(Alignment.LEADING, acTextPanelGroupLayout.createSequentialGroup()
                             .addComponent(mcResetGcStats)
                             .addPreferredGap(ComponentPlacement.RELATED, 90, Short.MAX_VALUE)
                             .addComponent(mcForceGcButton))
@@ -216,63 +357,45 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
                         .addComponent(mcHistoryDataComboBox, Alignment.LEADING, 0, 272, Short.MAX_VALUE))
                     .addContainerGap())
         );
-        gl_mcTextPanel.setVerticalGroup(
-            gl_mcTextPanel.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_mcTextPanel.createSequentialGroup()
-                    .addGroup(gl_mcTextPanel.createParallelGroup(Alignment.BASELINE)
+        acTextPanelGroupLayout.setVerticalGroup(
+            acTextPanelGroupLayout.createParallelGroup(Alignment.LEADING)
+                .addGroup(acTextPanelGroupLayout.createSequentialGroup()
+                    .addGroup(acTextPanelGroupLayout.createParallelGroup(Alignment.BASELINE)
                         .addComponent(mcEdenGenLabel)
                         .addComponent(mcEdenGenValue))
-                    .addGroup(gl_mcTextPanel.createParallelGroup(Alignment.BASELINE)
+                    .addGroup(acTextPanelGroupLayout.createParallelGroup(Alignment.BASELINE)
                         .addComponent(mcSurvivorGenLabel)
                         .addComponent(mcSurvivorGenValue))
-                    .addGroup(gl_mcTextPanel.createParallelGroup(Alignment.BASELINE)
+                    .addGroup(acTextPanelGroupLayout.createParallelGroup(Alignment.BASELINE)
                         .addComponent(mcOldGenLabel)
                         .addComponent(mcOldGenValue))
-                    .addGroup(gl_mcTextPanel.createParallelGroup(Alignment.BASELINE)
+                    .addGroup(acTextPanelGroupLayout.createParallelGroup(Alignment.BASELINE)
                         .addComponent(mcCommittedLabel)
                         .addComponent(mcCommittedValue))
-                    .addGroup(gl_mcTextPanel.createParallelGroup(Alignment.BASELINE)
+                    .addGroup(acTextPanelGroupLayout.createParallelGroup(Alignment.BASELINE)
                         .addComponent(mcMaxHeapLabel)
                         .addComponent(mcMaxHeapValue))
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addComponent(mcGcTextInfo)
                     .addPreferredGap(ComponentPlacement.RELATED)
-                    .addGroup(gl_mcTextPanel.createParallelGroup(Alignment.BASELINE)
+                    .addGroup(acTextPanelGroupLayout.createParallelGroup(Alignment.BASELINE)
                         .addComponent(mcResetGcStats)
                         .addComponent(mcForceGcButton))
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addComponent(mcThresholdSlider, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
+                    .addComponent(mcScrollPane, GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addComponent(mcHistoryDataComboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addContainerGap())
         );
-
-        mcGcLogList = new JList();
-        scrollPane.setViewportView(mcGcLogList);
-        mcGcLogList.setModel(mcGcLogListModel);
-        mcTextPanel.setLayout(gl_mcTextPanel);
-        getContentPane().setLayout(groupLayout);
-
-        mcResetGcStats.addActionListener(new ActionListener()
-        {
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                mcGcDetails.reset();
-                mcGcLogListModel.clear();
-            }
-        });
-//      mcGraphPanel.add(mcVmStatisticsGraph);
-        int lnGraphSize = 45+anNumStats+1;
-        int lnTextSize = 275;
-        setSize(lnGraphSize+lnTextSize, 450);
-        mcSplitPane.setDividerLocation(lnGraphSize);
-        setResizable(false);
-
     }
 
+
+    /**
+     * Called whenever new Garbage Collection statistics are collected.
+     * @param acGcStatistics
+     */
     @Override
     public void GcStatisticsUpdated(Map<String, VmGcStatistic> acGcStatistics)
     {
@@ -287,6 +410,10 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
         }
     }
 
+    /**
+     * Called whenever new Memory statistics are collected.
+     * @param acMemStatistics
+     */
     @Override
     public void MemoryStatisticsUpdated(VmMemoryStatistic acMemStatistics)
     {
