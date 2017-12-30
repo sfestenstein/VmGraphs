@@ -46,7 +46,7 @@ public class VmStatisticsPanel extends JPanel
     public VmStatisticsPanel(IStatisticsDatabase acDb)
     {
         super();
-        mcDb =acDb;
+        mcDb = acDb;
     }
 
     /**

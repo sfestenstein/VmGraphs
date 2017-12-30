@@ -39,7 +39,7 @@ public class VmFileUtils
     /**
      * combo box to select the desired file.
      */
-    JComboBox<String> mcFileComboBox = new JComboBox<String>();
+    private final JComboBox mcFileComboBox;
 
     /**
      * Base directory where we read/write VM Statistics.
@@ -53,10 +53,11 @@ public class VmFileUtils
      * @param anMaxNumberOfFiles - maximum number of files to keep around.
      * Oldest ones get deleted to make room for new ones.
      */
-    public VmFileUtils(String acBaseDirectory, int anMaxNumberOfFiles)
+    public VmFileUtils(String acBaseDirectory, int anMaxNumberOfFiles, JComboBox acFileComboBox)
     {
         mnMaxNumFiles = anMaxNumberOfFiles;
         mcBaseDirectory = acBaseDirectory;
+        mcFileComboBox = acFileComboBox;
         updateComboBox();
     }
 
@@ -64,7 +65,7 @@ public class VmFileUtils
      * Returns the JComboBox used to select previously saved data.
      * @return
      */
-    public JComboBox<String> getHistoryChooserComponent()
+    public JComboBox getHistoryChooserComponent()
     {
         return mcFileComboBox;
     }

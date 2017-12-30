@@ -85,7 +85,7 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
     /**
      * Combo box used to select saved off data and display them
      */
-    JComboBox<String> mcHistoryDataComboBox;
+    JComboBox mcHistoryDataComboBox = new JComboBox();
 
     /**
      * Put the mcGcCollectionList in a scroll pane.  It's just good practice!
@@ -102,12 +102,11 @@ public class VmStatisticsUI extends JFrame implements IVmStatisticListener
      */
     public VmStatisticsUI(int anNumStats, int anCollectionIntervalMs, String acSaveFileDirectory, int anMaxNumberOfFiles)
     {
-        mcFileUtils = new VmFileUtils(acSaveFileDirectory, anMaxNumberOfFiles);
+        mcFileUtils = new VmFileUtils(acSaveFileDirectory, anMaxNumberOfFiles, mcHistoryDataComboBox);
         mcDb = new VmStatisticDatabase(anNumStats, anCollectionIntervalMs, mcFileUtils);
         mcVmGcListModel = new VmGcListModel();
-        VmStatisticsPanel mcVmStatisticsGraphicsPanel = new VmStatisticsPanel(mcDb);
+        JPanel mcVmStatisticsGraphicsPanel = new VmStatisticsPanel(mcDb);
         mcDb.registerRefreshPanel(mcVmStatisticsGraphicsPanel);
-        mcHistoryDataComboBox = mcFileUtils.getHistoryChooserComponent();
 
         mcHistoryDataComboBox.addActionListener(new ActionListener()
         {
