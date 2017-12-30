@@ -322,13 +322,15 @@ public class VmStatisticDatabase implements IStatisticsDatabase
                     mcGcCollectionDb.put(lcGc.getName(), new VmGcStatistic(lcGc.getCollectionCount(), lcGc.getCollectionTime()));
                 }
 
-                if (mcGcDetailsListenerMap.containsKey(lcGc.getName()))
+                for (IGcDetailsListener lcListener : mcGcDetailsListenerMap.values())
                 {
-                    mcGcDetailsListenerMap.get(lcGc.getName()).setGcDetails(
-                            mcGcCollectionDb.get(lcGc.getName()).mnCollectionCount,
-                            mcGcCollectionDb.get(lcGc.getName()).mnCollectionTimeMs,
+                    lcListener.setGcDetails(
+                            lcGc.getCollectionCount(),
+                            lcGc.getCollectionTime(),
                             lcGc.getName());
+
                 }
+
             }
 
             // Get latest JVM Memory information and populate our

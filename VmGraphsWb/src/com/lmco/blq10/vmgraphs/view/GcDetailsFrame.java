@@ -5,8 +5,9 @@ import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -18,9 +19,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import com.lmco.blq10.vmgraphs.model.IGcDetailsListener;
+import com.lmco.blq10.vmgraphs.model.VmGcStatistic;
 
 /**
  * @class GcDetailsFrame
@@ -85,6 +88,10 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
      * We want mcGcList in a scroll pane.
      */
     private final JScrollPane mcListScrollPane;
+    private JLabel lcSlashLabel;
+    private JLabel lblGcCount;
+    private final Map<String, VmGcStatistic> mcCollectionDb = new HashMap<String, VmGcStatistic>();
+    private final Map<String, VmGcStatistic> mcCollectionResetDb =  new HashMap<String, VmGcStatistic>();
 
     /**
      * Constructor
@@ -102,10 +109,11 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
          */
         setResizable(false);
         mcCollectionCountLabel = new JLabel("---");
-        mcCollectionCountLabel.setBorder(BorderFactory.createTitledBorder("Garbage Collection Count"));
+        mcCollectionCountLabel.setHorizontalAlignment(SwingConstants.TRAILING);
+        mcCollectionCountLabel.setBorder(null);
 
         mcAverageGcTimeMslabel = new JLabel("---");
-        mcAverageGcTimeMslabel.setBorder(BorderFactory.createTitledBorder("Average Garbage Collection Time MS"));
+        mcAverageGcTimeMslabel.setBorder(null);
 
         JButton mcResetButton = new JButton("Reset Statistics");
 
@@ -121,32 +129,58 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
         mcListScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         mcListScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
+        lcSlashLabel = new JLabel("/");
+        lcSlashLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        lblGcCount = new JLabel("GC Count / Ave Time ms");
+
+        mcGcList = new JList<String>();
+        mcGcList.setModel(mcGcListModel);
+        mcListScrollPane.setViewportView(mcGcList);
+
         GroupLayout groupLayout = new GroupLayout(getContentPane());
         groupLayout.setHorizontalGroup(
-            groupLayout.createParallelGroup(Alignment.TRAILING)
+            groupLayout.createParallelGroup(Alignment.LEADING)
                 .addGroup(groupLayout.createSequentialGroup()
                     .addContainerGap()
-                    .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-                        .addComponent(mcListScrollPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
-                        .addComponent(mcAverageGcTimeMslabel, GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
-                        .addComponent(mcCollectionCountLabel, GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
-                        .addComponent(mcResetButton, Alignment.LEADING)
-                        .addComponent(mcSlider, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE))
+                    .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(groupLayout.createSequentialGroup()
+                            .addComponent(mcGcList, GroupLayout.PREFERRED_SIZE, 255, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(mcListScrollPane, GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE))
+                        .addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+                            .addComponent(lblGcCount)
+                            .addPreferredGap(ComponentPlacement.RELATED, 117, Short.MAX_VALUE)
+                            .addComponent(mcCollectionCountLabel, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(lcSlashLabel, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(mcAverageGcTimeMslabel, GroupLayout.PREFERRED_SIZE, 57, GroupLayout.PREFERRED_SIZE))
+                        .addComponent(mcSlider, GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
+                        .addComponent(mcResetButton))
                     .addContainerGap())
         );
         groupLayout.setVerticalGroup(
             groupLayout.createParallelGroup(Alignment.LEADING)
                 .addGroup(groupLayout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(mcCollectionCountLabel)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(mcAverageGcTimeMslabel, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(mcResetButton)
-                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+                        .addGroup(groupLayout.createSequentialGroup()
+                            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lcSlashLabel)
+                                .addComponent(mcAverageGcTimeMslabel)
+                                .addComponent(mcCollectionCountLabel))
+                            .addGap(27))
+                        .addGroup(groupLayout.createSequentialGroup()
+                            .addComponent(lblGcCount)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(mcResetButton, GroupLayout.PREFERRED_SIZE, 18, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.RELATED)))
                     .addComponent(mcSlider, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(mcListScrollPane, GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
+                    .addGap(6)
+                    .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+                        .addComponent(mcListScrollPane, GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
+                        .addComponent(mcGcList, GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE))
                     .addContainerGap())
         );
         getContentPane().setLayout(groupLayout);
@@ -155,18 +189,22 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
          * End Auto-Generated code
          */
 
-        mcGcList = new JList<String>();
-        mcGcList.setModel(mcGcListModel);
-        mcListScrollPane.setViewportView(mcGcList);
+
         mcResetButton.addActionListener(new ActionListener()
         {
             @Override
             public void actionPerformed(ActionEvent arg0)
             {
-                mnLastGcTimeResetMs = mnLastGcTimeMs;
-                mnCollectionCountReset = mnCollectionCount;
+                mnCollectionCountReset = 0;
+                mnLastGcTimeResetMs = 0;
+                for (String lcKey : mcCollectionDb.keySet())
+                {
+                    mnCollectionCountReset += mcCollectionDb.get(lcKey).mnCollectionCount;
+                    mnLastGcTimeResetMs +=  mcCollectionDb.get(lcKey).mnCollectionTimeMs;
+                }
                 mcCollectionCountLabel.setText("---");
                 mcAverageGcTimeMslabel.setText("---");
+                mcGcListModel.clear();
             }
         });
     }
@@ -191,30 +229,61 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
     @Override
     public void setGcDetails(long anCollectionCount, long anCollectionTimeMs, String acGcType)
     {
-        if (mnCollectionCount != anCollectionCount)
+        // If this is a new GC Type, add it to our databases.  Otherwise
+        // update existing entries.
+        if (!mcCollectionDb.containsKey(acGcType))
         {
-            if (anCollectionTimeMs - mnLastGcTimeMs > mcSlider.getValue())
+            mcCollectionDb.put(acGcType, new VmGcStatistic(anCollectionCount, anCollectionTimeMs));
+            mcCollectionResetDb.put(acGcType, new VmGcStatistic(0,0));
+        }
+        else
+        {
+            mcCollectionDb.get(acGcType).mnCollectionTimeMs = anCollectionTimeMs;
+            mcCollectionDb.get(acGcType).mnCollectionCount = anCollectionCount;
+        }
+
+        // Add up GC Statistics for all GC Types
+        long lnCollectionCountTally = 0;
+        long lnCollectionTimeMsTally = 0;
+        for (VmGcStatistic lcGcStat : mcCollectionDb.values())
+        {
+            lnCollectionCountTally += lcGcStat.mnCollectionCount;
+            lnCollectionTimeMsTally += lcGcStat.mnCollectionTimeMs;
+        }
+
+        // If the tallies have changed...
+        if (lnCollectionCountTally != mnCollectionCount)
+        {
+            // If the time since the last collection is greater than the slider
+            // value, add an entry into the list.
+            if (lnCollectionTimeMsTally - mnLastGcTimeMs > mcSlider.getValue())
             {
                 StringBuilder lcBuilder = new StringBuilder();
                 Date lcDate = new Date();
 
                 lcBuilder.append(mcDateFormat.format(lcDate));
                 lcBuilder.append(" : ");
-                lcBuilder.append(Long.toString(anCollectionTimeMs - mnLastGcTimeMs));
+                lcBuilder.append(Long.toString(lnCollectionTimeMsTally - mnLastGcTimeMs));
                 lcBuilder.append(" ms / ");
-                lcBuilder.append(Long.toString(anCollectionCount - mnCollectionCount));
+                lcBuilder.append(Long.toString(lnCollectionCountTally - mnCollectionCount));
+                lcBuilder.append(" ");
+                lcBuilder.append(acGcType);
 
-                mcGcListModel.addElement(lcBuilder.toString());
+                mcGcListModel.add(0,lcBuilder.toString());
             }
-            mnLastGcTimeMs = anCollectionTimeMs;
-            mnCollectionCount = anCollectionCount;
-            long lnCorrectedCollectionCount = mnCollectionCount - mnCollectionCountReset;
-            long lnCorrectedCollectionTimMs = mnLastGcTimeMs - mnLastGcTimeResetMs;
 
+            // Set member data to the current tallies
+            mnCollectionCount = lnCollectionCountTally;
+            mnLastGcTimeMs = lnCollectionTimeMsTally;
+
+            // Calcluate count and averages after correcting for the last
+            // time we hit the reset button.
+            long lnCorrectedCollectionCount = lnCollectionCountTally - mnCollectionCountReset;
+            long lnCorrectedCollectionTimeMs = lnCollectionTimeMsTally - mnLastGcTimeResetMs;
             long lnAverageGcTimeMs = 0;
             if (lnCorrectedCollectionCount != 0)
             {
-                lnAverageGcTimeMs = lnCorrectedCollectionTimMs / lnCorrectedCollectionCount;
+                lnAverageGcTimeMs = lnCorrectedCollectionTimeMs / lnCorrectedCollectionCount;
             }
 
             mcCollectionCountLabel.setText(Long.toString(lnCorrectedCollectionCount));
