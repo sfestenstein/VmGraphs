@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import javax.swing.JPanel;
@@ -118,12 +117,6 @@ public class VmStatisticDatabase implements IStatisticsDatabase
             new HashMap<String, VmGcStatistic>();
 
     /**
-     * Map of listeners for each garbage Collection Type.
-     */
-    private final Map<String, IGcDetailsListener> mcGcDetailsListenerMap =
-            new TreeMap<String, IGcDetailsListener>();
-
-    /**
      * Constructor
      */
     public VmStatisticDatabase(int anNumStatistics, int anCollectionIntervalMs, VmFileUtils acFileUtils)
@@ -177,42 +170,6 @@ public class VmStatisticDatabase implements IStatisticsDatabase
     public final Collection<VmMemoryStatistic> GetMemoryStatistics()
     {
         return mcMemoryStatistics;
-    }
-
-    /**
-     * Indicates if we have a listener registered for a particular
-     * Garbage Collection Type (ParNew, ConcurrentMarkSweep, etc.)
-     *
-     * @param acGcFrameName
-     * @return
-     */
-    public boolean hasListenerFor(String acGcFrameName)
-    {
-        return mcGcDetailsListenerMap.containsKey(acGcFrameName);
-    }
-
-    /**
-     * Adds a Garbage Collection Listener for a particular
-     * Garbage Collection Type (ParNew, ConcurrentMarkSweep, etc.)
-     *
-     * @param acGcDetailsName
-     * @param acListener
-     */
-    public void addGcDetailsListener(String acGcDetailsName, IGcDetailsListener acListener)
-    {
-        mcGcDetailsListenerMap.put(acGcDetailsName, acListener);
-    }
-
-    /**
-     * Returns the Garbage Collection Listener for a particular
-     * Garbage Collection Type (ParNew, ConcurrentMarkSweep, etc.)
-     *
-     * @param acGcDetailsName
-     * @param acListener
-     */
-    public IGcDetailsListener getGcDetailsListener(String acGcDetailsName)
-    {
-        return mcGcDetailsListenerMap.get(acGcDetailsName);
     }
 
     /**
@@ -321,16 +278,6 @@ public class VmStatisticDatabase implements IStatisticsDatabase
                 {
                     mcGcCollectionDb.put(lcGc.getName(), new VmGcStatistic(lcGc.getCollectionCount(), lcGc.getCollectionTime()));
                 }
-
-                for (IGcDetailsListener lcListener : mcGcDetailsListenerMap.values())
-                {
-                    lcListener.setGcDetails(
-                            lcGc.getCollectionCount(),
-                            lcGc.getCollectionTime(),
-                            lcGc.getName());
-
-                }
-
             }
 
             // Get latest JVM Memory information and populate our

@@ -137,7 +137,7 @@ public class GcDetailsCollector
             lcBuilder.append(lnCorrectedCollectionCount);
             lcBuilder.append(" / ");
             lcBuilder.append(" Ave Time ms = ");
-            lcBuilder.append(lnCorrectedCollectionTimeMs);
+            lcBuilder.append(lnAverageGcTimeMs);
             acGcDetailsLabel.setText(lcBuilder.toString());
         }
     }
