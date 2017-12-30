@@ -189,7 +189,7 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
      * @param anCollectionTimeMs
      */
     @Override
-    public void setGcDetails(long anCollectionCount, long anCollectionTimeMs)
+    public void setGcDetails(long anCollectionCount, long anCollectionTimeMs, String acGcType)
     {
         if (mnCollectionCount != anCollectionCount)
         {

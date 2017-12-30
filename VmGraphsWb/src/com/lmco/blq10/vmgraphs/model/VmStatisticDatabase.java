@@ -326,7 +326,8 @@ public class VmStatisticDatabase implements IStatisticsDatabase
                 {
                     mcGcDetailsListenerMap.get(lcGc.getName()).setGcDetails(
                             mcGcCollectionDb.get(lcGc.getName()).mnCollectionCount,
-                            mcGcCollectionDb.get(lcGc.getName()).mnCollectionTimeMs);
+                            mcGcCollectionDb.get(lcGc.getName()).mnCollectionTimeMs,
+                            lcGc.getName());
                 }
             }
 

@@ -15,7 +15,7 @@ public interface IGcDetailsListener
      * @param anCollectionCount
      * @param anCollectionTimeMs
      */
-    void setGcDetails(long anCollectionCount, long anCollectionTimeMs);
+    void setGcDetails(long anCollectionCount, long anCollectionTimeMs, String acGcType);
 
     /**
      * should return the JFrame encapsulating this listener.
