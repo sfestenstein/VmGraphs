@@ -179,10 +179,10 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
         mcHistoryDataComboBox = new JComboBox();
         mcFileUtils = new VmFileUtils(acSaveFileDirectory, anMaxNumberOfFiles, mcHistoryDataComboBox);
         mcDb = new VmStatisticDatabase(anNumStats, anCollectionIntervalMs, mcFileUtils);
-        JPanel lcVmStatisticsGraphicsPanel = new VmStatisticsPanel(mcDb);
+        JPanel lcVmStatisticsGraphicsPanel = new VmMemoryGraphPanel(mcDb);
         mcDb.registerRefreshPanel(lcVmStatisticsGraphicsPanel);
         mcDb.registerStatisticsListener(this);
-        mcGraphPanel = new VmStatisticsPanel(mcDb);
+        mcGraphPanel = new VmMemoryGraphPanel(mcDb);
         mcDb.registerRefreshPanel(mcGraphPanel);
 
         /**
@@ -244,7 +244,7 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
                 {
                     StaticStatisticsDatabase lcFileStatisticsDatabase = new
                             StaticStatisticsDatabase(mcFileUtils.getSavedData());
-                    VmStatisticsPanel lcStatPanel = new VmStatisticsPanel(lcFileStatisticsDatabase);
+                    VmMemoryGraphPanel lcStatPanel = new VmMemoryGraphPanel(lcFileStatisticsDatabase);
                     JFrame lcNewFrame = new JFrame();
                     lcNewFrame.setTitle((String) ((JComboBox)acEvent.getSource()).getSelectedItem());
                     lcNewFrame.getContentPane().add(lcStatPanel);

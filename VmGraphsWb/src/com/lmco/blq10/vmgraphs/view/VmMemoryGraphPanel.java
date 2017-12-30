@@ -16,7 +16,7 @@ import com.lmco.blq10.vmgraphs.model.VmMemoryStatistic;
  * @brief Main panel to display and graph memory usage.
  *
  */
-public class VmStatisticsPanel extends JPanel
+public class VmMemoryGraphPanel extends JPanel
 {
     /**
      * Offset pixels so we have space to render the Y Axis.  This sounds
@@ -43,7 +43,7 @@ public class VmStatisticsPanel extends JPanel
      *
      * @param acDb
      */
-    public VmStatisticsPanel(IStatisticsDatabase acDb)
+    public VmMemoryGraphPanel(IStatisticsDatabase acDb)
     {
         super();
         mcDb = acDb;
