@@ -12,9 +12,9 @@ import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -31,7 +31,7 @@ import com.lmco.blq10.vmgraphs.model.VmGcStatistic;
  *
  */
 @SuppressWarnings("serial")
-public class GcDetailsFrame extends JFrame implements IGcDetailsListener
+public class GcDetailsFrame extends JPanel implements IGcDetailsListener
 {
     /**
      * Date format for the list of long garbage collections.
@@ -101,13 +101,11 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
     public GcDetailsFrame(String acTitle)
     {
         mcGcListModel = new DefaultListModel<String>();
-        setTitle(acTitle);
 
         /**
          * Begin auto-generated code from Winbuilder Pro.  Do not modify any
          * of this code by hand unless you really know what you are doing.
          */
-        setResizable(false);
         mcCollectionCountLabel = new JLabel("---");
         mcCollectionCountLabel.setHorizontalAlignment(SwingConstants.TRAILING);
         mcCollectionCountLabel.setBorder(null);
@@ -138,15 +136,12 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
         mcGcList.setModel(mcGcListModel);
         mcListScrollPane.setViewportView(mcGcList);
 
-        GroupLayout groupLayout = new GroupLayout(getContentPane());
+        GroupLayout groupLayout = new GroupLayout(this);
         groupLayout.setHorizontalGroup(
             groupLayout.createParallelGroup(Alignment.LEADING)
                 .addGroup(groupLayout.createSequentialGroup()
-                    .addContainerGap()
                     .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
                         .addGroup(groupLayout.createSequentialGroup()
-                            .addComponent(mcGcList, GroupLayout.PREFERRED_SIZE, 255, GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(mcListScrollPane, GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE))
                         .addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
                             .addComponent(lblGcCount)
@@ -158,12 +153,11 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
                             .addComponent(mcAverageGcTimeMslabel, GroupLayout.PREFERRED_SIZE, 57, GroupLayout.PREFERRED_SIZE))
                         .addComponent(mcSlider, GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
                         .addComponent(mcResetButton))
-                    .addContainerGap())
+                  )
         );
         groupLayout.setVerticalGroup(
             groupLayout.createParallelGroup(Alignment.LEADING)
                 .addGroup(groupLayout.createSequentialGroup()
-                    .addContainerGap()
                     .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
                         .addGroup(groupLayout.createSequentialGroup()
                             .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
@@ -178,13 +172,12 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
                             .addPreferredGap(ComponentPlacement.RELATED)))
                     .addComponent(mcSlider, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addGap(6)
-                    .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
                         .addComponent(mcListScrollPane, GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
-                        .addComponent(mcGcList, GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE))
-                    .addContainerGap())
+                    )
         );
-        getContentPane().setLayout(groupLayout);
-        setSize(300, 450);
+        setLayout(groupLayout);
+//        setSize(258, 450);
+
         /**
          * End Auto-Generated code
          */
@@ -214,7 +207,7 @@ public class GcDetailsFrame extends JFrame implements IGcDetailsListener
      * return 'this' as a JFrame
      */
     @Override
-    public JFrame getGcDetailsFrame()
+    public JPanel getGcDetailsFrame()
     {
         return this;
     }

@@ -1,6 +1,6 @@
 package com.lmco.blq10.vmgraphs.model;
 
-import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 /**
  * @interface
@@ -21,6 +21,6 @@ public interface IGcDetailsListener
      * should return the JFrame encapsulating this listener.
      * @return
      */
-    JFrame getGcDetailsFrame();
+    JPanel getGcDetailsFrame();
 
 }
