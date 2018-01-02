@@ -14,7 +14,9 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 
 import javax.swing.JComboBox;
@@ -26,6 +28,14 @@ import javax.swing.JComboBox;
  */
 public class VmFileUtils
 {
+    /** Comparator for Files by date order. */
+    public static final Comparator<File> FILE_COMPARATOR =
+            new FileComparatorByDate();
+
+    /** Comparator for Files by date order. */
+    public static final Comparator<File> FILE_REVERSE_COMPARATOR =
+            new FileComparatorByReverseDate();
+
     /**
      * Maximum number of files that will be saved off at any time.
      */
@@ -158,7 +168,12 @@ public class VmFileUtils
     private void updateComboBox()
     {
         File lcFolder = new File(mcBaseDirectory);
+        if (!lcFolder.exists())
+        {
+            lcFolder.mkdir();
+        }
         File[] lacFiles = lcFolder.listFiles();
+        Arrays.sort(lacFiles, FILE_COMPARATOR);
 
         if (lacFiles.length > mnMaxNumFiles)
         {
@@ -168,6 +183,7 @@ public class VmFileUtils
             }
         }
         lacFiles = lcFolder.listFiles();
+        Arrays.sort(lacFiles, FILE_REVERSE_COMPARATOR);
         mcFileComboBox.removeAllItems();
         mcFileComboBox.addItem("---");
         mcFileComboBox.setSelectedIndex(0);
@@ -181,4 +197,44 @@ public class VmFileUtils
         }
     }
 
+    /**
+     * Comparator to list files in date order, oldest file date first
+     */
+    private static class FileComparatorByDate implements Comparator<File>
+    {
+        @Override
+        public int compare(File acFirst, File acSecond)
+        {
+            long lnVal = acFirst.lastModified() - acSecond.lastModified();
+            if (lnVal < 0)
+            {
+                return -1;
+            }
+            else if (lnVal > 0)
+           {
+                return 1;
+            }
+            return 0;
+        }
+    }
+    /**
+     * Comparator to list files in date order, oldest file date last
+     */
+    private static class FileComparatorByReverseDate implements Comparator<File>
+    {
+        @Override
+        public int compare(File acFirst, File acSecond)
+        {
+            long lnVal = acFirst.lastModified() - acSecond.lastModified();
+            if (lnVal > 0)
+            {
+                return -1;
+            }
+            else if (lnVal < 0)
+           {
+                return 1;
+            }
+            return 0;
+        }
+    }
 }

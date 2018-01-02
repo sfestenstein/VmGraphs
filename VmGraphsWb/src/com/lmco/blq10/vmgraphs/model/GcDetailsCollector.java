@@ -56,7 +56,9 @@ public class GcDetailsCollector
 
     }
 
-
+    /**
+     * Resets running counts and averages
+     */
     public void reset()
     {
         mnCollectionCountReset = 0;
@@ -74,7 +76,7 @@ public class GcDetailsCollector
      * @param anCollectionCount
      * @param anCollectionTimeMs
      */
-    public void setGcDetails(long anCollectionCount, long anCollectionTimeMs, String acGcType, int anThresholdMs, JLabel acGcDetailsLabel, DefaultListModel<String> mcGcListModel)
+    public void setGcDetails(long anCollectionCount, long anCollectionTimeMs, String acGcType, int anThresholdMs, JLabel acGcDetailsLabel, DefaultListModel mcGcListModel)
     {
         // If this is a new GC Type, add it to our databases.  Otherwise
         // update existing entries.

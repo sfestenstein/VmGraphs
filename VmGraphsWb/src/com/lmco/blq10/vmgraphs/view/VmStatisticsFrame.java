@@ -137,7 +137,7 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
     /**
      * List model to hold GC Logs
      */
-    DefaultListModel<String> mcGcLogListModel = new DefaultListModel<String>();
+    DefaultListModel mcGcLogListModel = new DefaultListModel();
 
     /**
      * Helper class to determine GC Visualisations.
@@ -172,8 +172,9 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
      * @param acSaveFileDirectory
      * @param anMaxNumberOfFiles
      */
-    public VmStatisticsFrame(int anNumStats, int anCollectionIntervalMs, String acSaveFileDirectory, int anMaxNumberOfFiles)
+    public VmStatisticsFrame(final int anNumStats, int anCollectionIntervalMs, String acSaveFileDirectory, int anMaxNumberOfFiles)
     {
+        super("VM Statistics");
         /**
          * Set up basic objects.
          */
