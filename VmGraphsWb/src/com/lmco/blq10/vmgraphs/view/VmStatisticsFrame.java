@@ -1,6 +1,7 @@
 package com.lmco.blq10.vmgraphs.view;
 
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
@@ -203,7 +204,9 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
         mcMaxHeapValue = new JLabel("---");
         mcGcTextInfo = new JLabel("GC Count = --- / Ave Time MS = ---");
         mcResetGcStats = new JButton("Reset GC Stats");
+        mcResetGcStats.setMargin(new Insets(0, 14, 0, 14));
         mcForceGcButton = new JButton("Force GC");
+        mcForceGcButton.setMargin(new Insets(0, 14, 0, 14));
         mcThresholdSlider = new JSlider();
         mcScrollPane = new JScrollPane();
         GroupLayout lcTextPanelGroupLayout = new GroupLayout(mcTextPanel);
