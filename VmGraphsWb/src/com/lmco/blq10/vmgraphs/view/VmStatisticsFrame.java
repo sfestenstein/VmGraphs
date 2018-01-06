@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -174,15 +175,17 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
      */
     public VmStatisticsFrame(final int anNumStats, int anCollectionIntervalMs, String acSaveFileDirectory, int anMaxNumberOfFiles)
     {
+        /**
+         * Lets give us a nice title
+         */
         super("VM Statistics");
+
         /**
          * Set up basic objects.
          */
         mcHistoryDataComboBox = new JComboBox();
         mcFileUtils = new VmFileUtils(acSaveFileDirectory, anMaxNumberOfFiles, mcHistoryDataComboBox);
         mcDb = new VmStatisticDatabase(anNumStats, anCollectionIntervalMs, mcFileUtils);
-        JPanel lcVmStatisticsGraphicsPanel = new VmMemoryGraphPanel(mcDb);
-        mcDb.registerRefreshPanel(lcVmStatisticsGraphicsPanel);
         mcDb.registerStatisticsListener(this);
         mcGraphPanel = new VmMemoryGraphPanel(mcDb);
         mcDb.registerRefreshPanel(mcGraphPanel);
@@ -247,7 +250,7 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
                 if (((JComboBox)acEvent.getSource()).getSelectedIndex() > 0)
                 {
                     StaticStatisticsDatabase lcFileStatisticsDatabase = new
-                            StaticStatisticsDatabase(mcFileUtils.getSavedData());
+                            StaticStatisticsDatabase((List<VmMemoryStatistic>) mcFileUtils.getSavedData());
                     VmMemoryGraphPanel lcStatPanel = new VmMemoryGraphPanel(lcFileStatisticsDatabase);
                     JFrame lcNewFrame = new JFrame();
                     lcNewFrame.setTitle((String) ((JComboBox)acEvent.getSource()).getSelectedItem());
@@ -282,7 +285,7 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
          */
         int lnGraphSize = 45+anNumStats+1;
         int lnTextSize = 275;
-        setSize(lnGraphSize+lnTextSize, 450);
+        setSize(lnGraphSize+lnTextSize, 400);
         mcSplitPane.setDividerLocation(lnGraphSize);
         setResizable(false);
     }
@@ -306,16 +309,6 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
         );
 
         mcSplitPane.setLeftComponent(mcGraphPanel);
-        GroupLayout gl_mcGraphPanel = new GroupLayout(mcGraphPanel);
-        gl_mcGraphPanel.setHorizontalGroup(
-            gl_mcGraphPanel.createParallelGroup(Alignment.LEADING)
-                .addGap(0, 437, Short.MAX_VALUE)
-        );
-        gl_mcGraphPanel.setVerticalGroup(
-            gl_mcGraphPanel.createParallelGroup(Alignment.LEADING)
-                .addGap(0, 456, Short.MAX_VALUE)
-        );
-        mcGraphPanel.setLayout(gl_mcGraphPanel);
 
         mcTextPanel.setPreferredSize(new Dimension(250, 10));
         mcSplitPane.setRightComponent(mcTextPanel);

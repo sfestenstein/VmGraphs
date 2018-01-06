@@ -14,10 +14,12 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import javax.swing.JComboBox;
 
@@ -159,7 +161,10 @@ public class VmFileUtils
             e.printStackTrace();
         }
 
-        return lcSavedData;
+        List<VmMemoryStatistic> lcSavedList = new ArrayList<VmMemoryStatistic>();
+        lcSavedList.addAll(lcSavedData);
+
+        return lcSavedList;
     }
 
     /**
@@ -217,6 +222,7 @@ public class VmFileUtils
             return 0;
         }
     }
+
     /**
      * Comparator to list files in date order, oldest file date last
      */

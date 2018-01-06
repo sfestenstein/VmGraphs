@@ -1,6 +1,7 @@
 package com.lmco.blq10.vmgraphs.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @class VmMemoryStatistic
@@ -12,7 +13,8 @@ public class VmMemoryStatistic implements Serializable
      * Serial Version ID.  NECESSARY!!!!  Objects of this type are saved to
      * and loaded from a file, file utils assumes this is a serializable class.
      */
-    private static final long serialVersionUID = 7756525984129702378L;
+    private static final long serialVersionUID = 5889682500555588584L;
+
 
     /**
      * Size of memory that was recently "new'd" up.
@@ -40,4 +42,9 @@ public class VmMemoryStatistic implements Serializable
      * Maximum allowable memory that can me "new'd".
      */
     public float mrMaxSizeMb;
+
+    /**
+     * Date of statistic collection.
+     */
+    public Date mcDateStampOfStatistic;
 }

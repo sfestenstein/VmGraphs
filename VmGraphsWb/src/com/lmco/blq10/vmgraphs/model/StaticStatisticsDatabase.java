@@ -1,6 +1,6 @@
 package com.lmco.blq10.vmgraphs.model;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * @class StaticStatisticsDatabase
@@ -12,7 +12,7 @@ public class StaticStatisticsDatabase implements IStatisticsDatabase
     /**
      * Collection of memory statistics
      */
-    private final Collection<VmMemoryStatistic> mcMemoryStatistics;
+    private final List<VmMemoryStatistic> mcMemoryStatistics;
 
     /**
      * The latest statistic in mcMemoryStatistic.
@@ -24,7 +24,7 @@ public class StaticStatisticsDatabase implements IStatisticsDatabase
      *
      * @param acMemoryStatistics
      */
-    public StaticStatisticsDatabase(Collection<VmMemoryStatistic> acMemoryStatistics)
+    public StaticStatisticsDatabase(List<VmMemoryStatistic> acMemoryStatistics)
     {
         mcMemoryStatistics = acMemoryStatistics;
         mcLatestMemoryStatistic = new VmMemoryStatistic();
@@ -91,7 +91,7 @@ public class StaticStatisticsDatabase implements IStatisticsDatabase
      * Returns the collection of memory statistics.
      */
     @Override
-    public Collection<VmMemoryStatistic> GetMemoryStatistics()
+    public List<VmMemoryStatistic> GetMemoryStatistics()
     {
         return mcMemoryStatistics;
     }

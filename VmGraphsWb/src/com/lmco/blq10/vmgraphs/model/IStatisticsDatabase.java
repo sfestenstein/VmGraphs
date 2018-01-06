@@ -1,6 +1,6 @@
 package com.lmco.blq10.vmgraphs.model;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * @interface
@@ -43,5 +43,5 @@ public interface IStatisticsDatabase
      * Returns our current collection of memory statistics.
      * @return
      */
-    public Collection<VmMemoryStatistic> GetMemoryStatistics();
+    public List<VmMemoryStatistic> GetMemoryStatistics();
 }

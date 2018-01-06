@@ -4,16 +4,15 @@ import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
-import java.util.Collection;
-import java.util.Deque;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.LinkedBlockingDeque;
 
 import javax.swing.JPanel;
 
@@ -42,8 +41,8 @@ public class VmStatisticDatabase implements IStatisticsDatabase
     /**
      * Actual collection of memory statistics.
      */
-    private final Deque <VmMemoryStatistic> mcMemoryStatistics =
-            new LinkedBlockingDeque<VmMemoryStatistic>();
+    private final LinkedList <VmMemoryStatistic> mcMemoryStatistics =
+            new LinkedList<VmMemoryStatistic>();
 
     /**
      * Collection of everyone interested in updates to this database.
@@ -167,7 +166,7 @@ public class VmStatisticDatabase implements IStatisticsDatabase
      * @return
      */
     @Override
-    public final Collection<VmMemoryStatistic> GetMemoryStatistics()
+    public final List<VmMemoryStatistic> GetMemoryStatistics()
     {
         return mcMemoryStatistics;
     }
@@ -179,7 +178,7 @@ public class VmStatisticDatabase implements IStatisticsDatabase
     {
         for (IVmStatisticListener lcListener : mcStatisticsListeners)
         {
-            lcListener.MemoryStatisticsUpdated(mcMemoryStatistics.peekFirst());
+            lcListener.MemoryStatisticsUpdated(mcMemoryStatistics.get(mcMemoryStatistics.size()-1));
             lcListener.GcStatisticsUpdated(mcGcCollectionDb);
         }
     }
@@ -257,7 +256,7 @@ public class VmStatisticDatabase implements IStatisticsDatabase
             // recycle the oldest, otherwise new one up.
             if (mcMemoryStatistics.size() >= mnNumStatistics)
             {
-                lcMemoryStatistic = mcMemoryStatistics.pollLast();
+                lcMemoryStatistic = mcMemoryStatistics.removeLast();
             }
             else
             {
@@ -310,9 +309,11 @@ public class VmStatisticDatabase implements IStatisticsDatabase
             mrOldGenSizeMb = lcMemoryStatistic.mrOldGenSizeMb;
             mrSurvivorGenSizeMb = lcMemoryStatistic.mrSurvivorSizeMb;
             mrEdenGenSizeMb = lcMemoryStatistic.mrEdenSizeMb;
+            lcMemoryStatistic.mcDateStampOfStatistic = new Date();
 
             // Push statistics into our internal Deques
-            mcMemoryStatistics.addFirst(lcMemoryStatistic);
+//            mcMemoryStatistics.addFirst(lcMemoryStatistic);
+            mcMemoryStatistics.add(0, lcMemoryStatistic);
 
             // Now, update everyone who cares about this stuff.
             updateListeners();
