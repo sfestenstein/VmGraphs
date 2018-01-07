@@ -1,8 +1,7 @@
 package com.lmco.blq10.vmgraphs.model;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,11 +15,6 @@ import javax.swing.JLabel;
  */
 public class GcDetailsCollector
 {
-    /**
-     * Date format for the list of long garbage collections.
-     */
-    private static final DateFormat mcDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-
     /**
      * Latest count of garbage collections to date
      */
@@ -47,16 +41,6 @@ public class GcDetailsCollector
     private final Map<String, VmGcStatistic> mcCollectionDb = new HashMap<String, VmGcStatistic>();
 
     /**
-     * Constructor
-     *
-     * @param acTitle
-     */
-    public GcDetailsCollector()
-    {
-
-    }
-
-    /**
      * Resets running counts and averages
      */
     public void reset()
@@ -76,7 +60,7 @@ public class GcDetailsCollector
      * @param anCollectionCount
      * @param anCollectionTimeMs
      */
-    public void setGcDetails(long anCollectionCount, long anCollectionTimeMs, String acGcType, int anThresholdMs, JLabel acGcDetailsLabel, DefaultListModel mcGcListModel)
+    public void setGcDetails(long anCollectionCount, long anCollectionTimeMs, String acGcType, int anThresholdMs, JLabel acGcDetailsLabel, Deque<GcLogItem> acLogList)
     {
         // If this is a new GC Type, add it to our databases.  Otherwise
         // update existing entries.
@@ -102,23 +86,13 @@ public class GcDetailsCollector
         // If the tallies have changed...
         if (lnCollectionCountTally != mnCollectionCount)
         {
-            // If the time since the last collection is greater than the slider
-            // value, add an entry into the list.
-            if (lnCollectionTimeMsTally - mnLastGcTimeMs > anThresholdMs)
-            {
-                StringBuilder lcBuilder = new StringBuilder();
-                Date lcDate = new Date();
-
-                lcBuilder.append(mcDateFormat.format(lcDate));
-                lcBuilder.append(" : ");
-                lcBuilder.append(Long.toString(lnCollectionTimeMsTally - mnLastGcTimeMs));
-                lcBuilder.append(" ms / ");
-                lcBuilder.append(Long.toString(lnCollectionCountTally - mnCollectionCount));
-                lcBuilder.append(" ");
-                lcBuilder.append(acGcType);
-
-                mcGcListModel.add(0,lcBuilder.toString());
-            }
+            // Create Log Item and push it to the front of the list.
+            GcLogItem lcLogItem = new GcLogItem();
+            lcLogItem.mcDate = new Date();
+            lcLogItem.mnCollections = lnCollectionCountTally - mnCollectionCount;
+            lcLogItem.mnGcTimeMs = lnCollectionTimeMsTally - mnLastGcTimeMs;
+            lcLogItem.mcGcType = acGcType;
+            acLogList.addFirst(lcLogItem);
 
             // Set member data to the current tallies
             mnCollectionCount = lnCollectionCountTally;
@@ -134,6 +108,7 @@ public class GcDetailsCollector
                 lnAverageGcTimeMs = lnCorrectedCollectionTimeMs / lnCorrectedCollectionCount;
             }
 
+            // set label text for count / average time
             StringBuilder lcBuilder = new StringBuilder();
             lcBuilder.append("GC Count = ");
             lcBuilder.append(lnCorrectedCollectionCount);
@@ -141,6 +116,25 @@ public class GcDetailsCollector
             lcBuilder.append(" Ave Time ms = ");
             lcBuilder.append(lnAverageGcTimeMs);
             acGcDetailsLabel.setText(lcBuilder.toString());
+        }
+    }
+
+    /**
+     * Static function to filter a list of log entries based on threshold and
+     * populate a list model.
+     *
+     * @param anThresholdMs
+     * @param acLogList
+     * @param acFilteredModel
+     */
+    public static void filterGcLogs(int anThresholdMs, final Deque<GcLogItem> acLogList, DefaultListModel acFilteredModel)
+    {
+        for (GcLogItem lcItem : acLogList)
+        {
+            if (lcItem.mnGcTimeMs > anThresholdMs)
+            {
+                acFilteredModel.addElement(lcItem);
+            }
         }
     }
 }

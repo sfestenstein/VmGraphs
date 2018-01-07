@@ -326,6 +326,10 @@ public class VmStatisticDatabase implements IStatisticsDatabase
         }
     }
 
+    /**
+     * Timer Task to save off memory statistics to a file.
+     *
+     */
     private class FileSaveOffTask extends TimerTask
     {
         /**

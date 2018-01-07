@@ -4,9 +4,11 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
@@ -22,9 +24,13 @@ import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import com.lmco.blq10.vmgraphs.model.GcDetailsCollector;
+import com.lmco.blq10.vmgraphs.model.GcLogItem;
 import com.lmco.blq10.vmgraphs.model.IVmStatisticListener;
 import com.lmco.blq10.vmgraphs.model.StaticStatisticsDatabase;
 import com.lmco.blq10.vmgraphs.model.VmFileUtils;
@@ -136,9 +142,15 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
     GroupLayout mcMainGroupLayout = new GroupLayout(getContentPane());
 
     /**
-     * List model to hold GC Logs
+     * Deque to hold all GC Logs
      */
-    DefaultListModel mcGcLogListModel = new DefaultListModel();
+    Deque<GcLogItem> mcGcLogDeque = new ConcurrentLinkedDeque<GcLogItem>();
+
+    /**
+     * Default List model to display filtered GC logs
+     * on collection duration.
+     */
+    DefaultListModel mcFilteredGcLogListModel = new DefaultListModel();
 
     /**
      * Helper class to determine GC Visualisations.
@@ -222,7 +234,7 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
         mcThresholdSlider.setPaintTicks(true);
         mcThresholdSlider.setSnapToTicks(true);
         mcThresholdSlider.setMinorTickSpacing(50);
-        mcThresholdSlider.setMajorTickSpacing(250);
+        mcThresholdSlider.setMajorTickSpacing(200);
         mcThresholdSlider.setValue(150);
         mcThresholdSlider.setMaximum(1000);
         mcScrollPane.setViewportView(mcGcLogList);
@@ -237,7 +249,7 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
         /**
          * Set models
          */
-        mcGcLogList.setModel(mcGcLogListModel);
+        mcGcLogList.setModel(mcFilteredGcLogListModel);
 
         /**
          * Add action listeners to a few componenets.
@@ -261,22 +273,41 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
             }
         });
 
+        /**
+         * Reset GC stuff when reset button is clicked.
+         */
         mcResetGcStats.addActionListener(new ActionListener()
         {
             @Override
             public void actionPerformed(ActionEvent e)
             {
                 mcGcDetails.reset();
-                mcGcLogListModel.clear();
+                mcGcLogDeque.clear();
+                mcFilteredGcLogListModel.clear();
             }
         });
 
+        /**
+         * Force a Garbage Collection
+         */
         mcForceGcButton.addActionListener(new ActionListener()
         {
             @Override
             public void actionPerformed(ActionEvent e)
             {
                 System.gc();
+            }
+        });
+
+        /**
+         * Filter logs whenever the threshold slider changes.
+         */
+        mcThresholdSlider.addChangeListener(new ChangeListener()
+        {
+            @Override
+            public void stateChanged(ChangeEvent e)
+            {
+                filterGcLogs();
             }
         });
 
@@ -403,8 +434,26 @@ public class VmStatisticsFrame extends JFrame implements IVmStatisticListener
                     lcEntry.getKey(),
                     mcThresholdSlider.getValue(),
                     mcGcTextInfo,
-                    mcGcLogListModel);
+                    mcGcLogDeque);
         }
+        filterGcLogs();
+    }
+
+    /**
+     * One spot to filter GC Logs.  Done in the UI Thread to avoid
+     * race conditions
+     */
+    private void filterGcLogs()
+    {
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                mcFilteredGcLogListModel.clear();
+                GcDetailsCollector.filterGcLogs(mcThresholdSlider.getValue(), mcGcLogDeque, mcFilteredGcLogListModel);
+            }
+        });
     }
 
     /**
